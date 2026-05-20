@@ -4,6 +4,9 @@ const {
 
 const apiKey =
   process.env.GEMINI_API_KEY;
+const defaultModelName =
+  process.env.GEMINI_MODEL ||
+  "gemini-1.5-flash-latest";
 
 if (!apiKey) {
   console.warn(
@@ -34,7 +37,7 @@ async function chat(
       {
         model:
           options.model ||
-          "gemini-1.5-flash",
+          defaultModelName,
       }
     );
 
@@ -79,7 +82,7 @@ async function symptomCheck(
       {
         model:
           options.model ||
-          "gemini-1.5-flash",
+          defaultModelName,
       }
     );
 
