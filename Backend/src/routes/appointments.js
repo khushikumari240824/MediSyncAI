@@ -26,7 +26,7 @@ router.post(
       }
 
       const { doctorId, appointmentDate, appointmentTime, reason } = req.body;
-      const patient = await Patient.findOne({ userId: req.user._id });
+      const patient = await Patient.findOne({ user: req.user._id });
 
       if (!patient) {
         return res.status(404).json({ message: "Patient profile not found" });
@@ -55,7 +55,7 @@ router.post(
 // Get patient appointments
 router.get("/patient", auth, authorize("patient"), async (req, res) => {
   try {
-    const patient = await Patient.findOne({ userId: req.user._id });
+    const patient = await Patient.findOne({ user: req.user._id });
     if (!patient) {
       return res.status(404).json({ message: "Patient profile not found" });
     }
@@ -74,7 +74,7 @@ router.get("/patient", auth, authorize("patient"), async (req, res) => {
 // Get doctor appointments
 router.get("/doctor", auth, authorize("doctor"), async (req, res) => {
   try {
-    const doctor = await Doctor.findOne({ userId: req.user._id });
+    const doctor = await Doctor.findOne({ user: req.user._id });
     if (!doctor) {
       return res.status(404).json({ message: "Doctor profile not found" });
     }
@@ -118,7 +118,7 @@ router.patch(
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const doctor = await Doctor.findOne({ userId: req.user._id });
+      const doctor = await Doctor.findOne({ user: req.user._id });
       const appointment = await Appointment.findById(req.params.id);
 
       if (!appointment) {
@@ -154,7 +154,7 @@ router.patch(
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const doctor = await Doctor.findOne({ userId: req.user._id });
+      const doctor = await Doctor.findOne({ user: req.user._id });
       const appointment = await Appointment.findById(req.params.id);
 
       if (!appointment) {
@@ -180,20 +180,37 @@ router.patch(
 );
 
 // Get single appointment
-router.get("/:id", auth, async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
   try {
     const appointment = await Appointment.findById(req.params.id)
-      .populate("patientId")
-      .populate("doctorId");
+      .populate('patientId')
+      .populate('doctorId');
 
     if (!appointment) {
-      return res.status(404).json({ message: "Appointment not found" });
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+
+    // Role-based access: patient owner, doctor owner, hospital, admin
+    const role = req.user.role;
+
+    if (role === 'patient') {
+      const patient = await Patient.findOne({ user: req.user._id });
+      if (!patient || appointment.patientId.toString() !== patient._id.toString()) {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+    } else if (role === 'doctor') {
+      const doctor = await Doctor.findOne({ user: req.user._id });
+      if (!doctor || appointment.doctorId.toString() !== doctor._id.toString()) {
+        return res.status(403).json({ message: 'Not authorized' });
+      }
+    } else if (!['hospital', 'admin'].includes(role)) {
+      return res.status(403).json({ message: 'Not authorized' });
     }
 
     res.json(appointment);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 

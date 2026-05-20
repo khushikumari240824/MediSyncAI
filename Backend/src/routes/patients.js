@@ -7,7 +7,7 @@ const router = express.Router();
 // Get patient profile
 router.get("/me", auth, authorize("patient"), async (req, res) => {
   try {
-    const patient = await Patient.findOne({ userId: req.user._id });
+    const patient = await Patient.findOne({ user: req.user._id });
     if (!patient) {
       return res.status(404).json({ message: "Patient profile not found" });
     }
@@ -32,7 +32,7 @@ router.get("/all", auth, authorize("hospital"), async (req, res) => {
 // Update patient profile
 router.patch("/me", auth, authorize("patient"), async (req, res) => {
   try {
-    const patient = await Patient.findOne({ userId: req.user._id });
+    const patient = await Patient.findOne({ user: req.user._id });
     if (!patient) {
       return res.status(404).json({ message: "Patient profile not found" });
     }

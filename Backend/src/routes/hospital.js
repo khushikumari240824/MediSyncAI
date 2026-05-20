@@ -11,7 +11,7 @@ const router = express.Router();
 // Get hospital profile
 router.get("/profile", auth, authorize("hospital"), async (req, res) => {
   try {
-    const hospital = await Hospital.findOne({ userId: req.user._id });
+    const hospital = await Hospital.findOne({ user: req.user._id });
     if (!hospital) {
       return res.status(404).json({ message: "Hospital profile not found" });
     }
@@ -25,7 +25,7 @@ router.get("/profile", auth, authorize("hospital"), async (req, res) => {
 // Update hospital profile
 router.patch("/profile", auth, authorize("hospital"), async (req, res) => {
   try {
-    const hospital = await Hospital.findOne({ userId: req.user._id });
+    const hospital = await Hospital.findOne({ user: req.user._id });
     if (!hospital) {
       return res.status(404).json({ message: "Hospital profile not found" });
     }
@@ -113,7 +113,7 @@ router.get(
   async (req, res) => {
     try {
       const pendingDoctors = await Doctor.find({ status: "pending" }).populate(
-        "userId",
+        "user",
         "email",
       );
       res.json(pendingDoctors);

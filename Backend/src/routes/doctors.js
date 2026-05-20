@@ -7,7 +7,7 @@ const router = express.Router();
 // Get doctor profile
 router.get("/me", auth, authorize("doctor"), async (req, res) => {
   try {
-    const doctor = await Doctor.findOne({ userId: req.user._id });
+    const doctor = await Doctor.findOne({ user: req.user._id });
     if (!doctor) {
       return res.status(404).json({ message: "Doctor profile not found" });
     }
@@ -18,11 +18,11 @@ router.get("/me", auth, authorize("doctor"), async (req, res) => {
   }
 });
 
-// Get all doctors (Patient/Hospital)
-router.get("/all", auth, async (req, res) => {
+// Get all doctors (Patient/Hospital/Admin)
+router.get("/all", auth, authorize("patient", "hospital", "admin"), async (req, res) => {
   try {
     const doctors = await Doctor.find()
-      .select("-userId")
+      .select("-user")
       .sort({ createdAt: -1 });
     res.json(doctors);
   } catch (error) {
@@ -32,9 +32,9 @@ router.get("/all", auth, async (req, res) => {
 });
 
 // Get single doctor
-router.get("/:id", auth, async (req, res) => {
+router.get("/:id", auth, authorize("patient", "hospital", "doctor", "admin"), async (req, res) => {
   try {
-    const doctor = await Doctor.findById(req.params.id).select("-userId");
+    const doctor = await Doctor.findById(req.params.id).select("-user");
     if (!doctor) {
       return res.status(404).json({ message: "Doctor not found" });
     }
@@ -48,12 +48,12 @@ router.get("/:id", auth, async (req, res) => {
 // Update doctor profile
 router.patch("/me", auth, authorize("doctor"), async (req, res) => {
   try {
-    const doctor = await Doctor.findOne({ userId: req.user._id });
+    const doctor = await Doctor.findOne({ user: req.user._id });
     if (!doctor) {
       return res.status(404).json({ message: "Doctor profile not found" });
     }
 
-    // Update allowed fields (excluding licenseNumber and userId)
+    // Update allowed fields (excluding licenseNumber and user)
     const allowedUpdates = [
       "firstName",
       "lastName",
