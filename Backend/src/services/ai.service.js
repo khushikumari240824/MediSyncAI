@@ -5,6 +5,17 @@ const {
 // Get Gemini API key from .env
 const apiKey =
   process.env.GEMINI_API_KEY;
+const defaultModelName =
+  process.env.GEMINI_MODEL ||
+  "gemini-2.5-flash";
+const fallbackModelNames = [
+  defaultModelName,
+  "gemini-2.5-flash",
+  "gemini-2.0-flash",
+  "gemini-1.5-flash",
+  "gemini-1.5-pro",
+  "gemini-pro",
+].filter(Boolean);
 
 if (!apiKey) {
   console.warn(
@@ -17,6 +28,66 @@ const genAI =
   new GoogleGenerativeAI(
     apiKey
   );
+
+function buildContents(messages) {
+  return messages.map((message) => ({
+    role:
+      message.role === "assistant"
+        ? "model"
+        : "user",
+    parts: [
+      {
+        text: String(message.content || ""),
+      },
+    ],
+  }));
+}
+
+async function generateWithFallback(
+  promptOrMessages,
+  options = {}
+) {
+  const candidateModels = [
+    ...(options.model ? [options.model] : []),
+    ...fallbackModelNames,
+  ];
+
+  let lastError = null;
+
+  for (const modelName of candidateModels) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+      });
+
+      const result =
+        await model.generateContent(
+          promptOrMessages
+        );
+      const response = await result.response;
+
+      return {
+        model: modelName,
+        text: response.text(),
+      };
+    } catch (error) {
+      lastError = error;
+      const message = String(
+        error?.message || error
+      );
+      const isModelError =
+        message.includes("404") ||
+        message.includes("not found") ||
+        message.includes("not supported");
+
+      if (!isModelError) {
+        throw error;
+      }
+    }
+  }
+
+  throw lastError || new Error("AI error");
+}
 
 /**
  * Chat with AI
@@ -35,39 +106,20 @@ async function chat(
       );
     }
 
-    const model =
-      genAI.getGenerativeModel(
-        {
-          model:
-            options.model ||
-            "gemini-1.5-flash",
-        }
-      );
-
-    // Get latest user message
-    const latestMessage =
-      messages[
-        messages.length - 1
-      ]?.content;
-
-    if (!latestMessage) {
-      throw new Error(
-        "User message is required"
-      );
-    }
-
-    const result =
-      await model.generateContent(
-        latestMessage
-      );
+    const contents = buildContents(
+      messages
+    );
 
     const response =
-      await result.response;
+      await generateWithFallback(
+        contents,
+        options
+      );
 
     return {
       role: "assistant",
-      content:
-        response.text(),
+      content: response.text,
+      model: response.model,
     };
   } catch (error) {
     console.error(
@@ -99,15 +151,6 @@ async function symptomCheck(
         "Symptoms are required"
       );
     }
-
-    const model =
-      genAI.getGenerativeModel(
-        {
-          model:
-            options.model ||
-            "gemini-1.5-flash",
-        }
-      );
 
     const prompt = `
 You are a medical assistant chatbot.
@@ -147,17 +190,15 @@ Important:
 - Suggest emergency care if symptoms seem serious.
 `;
 
-    const result =
-      await model.generateContent(
-        prompt
+    const response =
+      await generateWithFallback(
+        prompt,
+        options
       );
 
-    const response =
-      await result.response;
-
     return {
-      analysis:
-        response.text(),
+      analysis: response.text,
+      model: response.model,
     };
   } catch (error) {
     console.error(
