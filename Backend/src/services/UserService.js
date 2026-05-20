@@ -8,9 +8,14 @@ const env = require("../config/env");
 
 class UserService {
   static generateToken(userId) {
-    return jwt.sign({ userId }, env.jwtSecret, { expiresIn: "7d" });
+    return jwt.sign(
+      { userId },
+      env.jwtSecret,
+      { expiresIn: "7d" }
+    );
   }
 
+  // Register Patient
   static async registerPatient(payload) {
     const {
       email,
@@ -26,9 +31,15 @@ class UserService {
       allergies,
     } = payload;
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({
+      email,
+    });
+
     if (existingUser) {
-      throw new ApiError(400, "An account with this email already exists.");
+      throw new ApiError(
+        400,
+        "An account with this email already exists."
+      );
     }
 
     const patient = await Patient.create({
@@ -44,11 +55,15 @@ class UserService {
     });
 
     const user = await User.create({
+      name: `${firstName} ${lastName}`,
       email,
       password,
       role: "patient",
       profileId: patient._id,
       roleModel: "Patient",
+      phoneNumber: phone,
+      gender: gender.toLowerCase(),
+      dateOfBirth,
     });
 
     patient.userId = user._id;
@@ -56,6 +71,7 @@ class UserService {
 
     return {
       token: this.generateToken(user._id),
+
       user: {
         id: user._id,
         email: user.email,
@@ -65,6 +81,7 @@ class UserService {
     };
   }
 
+  // Register Doctor
   static async registerDoctor(payload) {
     const {
       email,
@@ -81,16 +98,26 @@ class UserService {
       availability,
     } = payload;
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({
+      email,
+    });
+
     if (existingUser) {
-      throw new ApiError(400, "An account with this email already exists.");
+      throw new ApiError(
+        400,
+        "An account with this email already exists."
+      );
     }
 
-    const existingDoctor = await Doctor.findOne({ licenseNumber });
+    const existingDoctor =
+      await Doctor.findOne({
+        licenseNumber,
+      });
+
     if (existingDoctor) {
       throw new ApiError(
         400,
-        "A doctor with this license number already exists.",
+        "A doctor with this license number already exists."
       );
     }
 
@@ -98,22 +125,29 @@ class UserService {
       firstName,
       lastName,
       specialization,
-      qualification: qualification || "Not specified",
+      qualification:
+        qualification ||
+        "Not specified",
       licenseNumber,
       phone,
       email,
       department,
-      experience: experience || 0,
-      consultationFee: consultationFee || 0,
-      availability: availability || {},
+      experience:
+        experience || 0,
+      consultationFee:
+        consultationFee || 0,
+      availability:
+        availability || {},
     });
 
     const user = await User.create({
+      name: `${firstName} ${lastName}`,
       email,
       password,
       role: "doctor",
       profileId: doctor._id,
       roleModel: "Doctor",
+      phoneNumber: phone,
     });
 
     doctor.userId = user._id;
@@ -121,6 +155,7 @@ class UserService {
 
     return {
       token: this.generateToken(user._id),
+
       user: {
         id: user._id,
         email: user.email,
@@ -130,6 +165,7 @@ class UserService {
     };
   }
 
+  // Register Hospital
   static async registerHospital(payload) {
     const {
       email,
@@ -141,41 +177,62 @@ class UserService {
       departments,
     } = payload;
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      throw new ApiError(400, "An account with this email already exists.");
-    }
+    const existingUser =
+      await User.findOne({
+        email,
+      });
 
-    const existingHospital = await Hospital.findOne({ registrationNumber });
-    if (existingHospital) {
+    if (existingUser) {
       throw new ApiError(
         400,
-        "A hospital with this registration number already exists.",
+        "An account with this email already exists."
       );
     }
 
-    const hospital = await Hospital.create({
-      name,
-      address,
-      phone,
-      email,
-      registrationNumber,
-      departments: departments || [],
-    });
+    const existingHospital =
+      await Hospital.findOne({
+        registrationNumber,
+      });
+
+    if (existingHospital) {
+      throw new ApiError(
+        400,
+        "A hospital with this registration number already exists."
+      );
+    }
+
+    const hospital =
+      await Hospital.create({
+        name,
+        address,
+        phone,
+        email,
+        registrationNumber,
+        departments:
+          departments || [],
+      });
 
     const user = await User.create({
+      name,
       email,
       password,
       role: "hospital",
-      profileId: hospital._id,
-      roleModel: "Hospital",
+      profileId:
+        hospital._id,
+      roleModel:
+        "Hospital",
+      phoneNumber: phone,
     });
 
     hospital.userId = user._id;
     await hospital.save();
 
     return {
-      token: this.generateToken(user._id),
+      token:
+        this.generateToken(
+          user._id
+        ),
+
       user: {
         id: user._id,
         email: user.email,
@@ -185,83 +242,166 @@ class UserService {
     };
   }
 
+  // Login
   static async login(payload) {
-    const { email, password } = payload;
+    const {
+      email,
+      password,
+    } = payload;
 
-    const user = await User.findOne({ email }).populate("profileId");
+    const user =
+      await User.findOne({
+        email,
+      })
+        .select(
+          "+password"
+        )
+        .populate(
+          "profileId"
+        );
+
     if (!user) {
-      throw new ApiError(400, "Invalid credentials");
+      throw new ApiError(
+        400,
+        "Invalid credentials"
+      );
     }
 
-    const isMatch = await user.comparePassword(password);
+    const isMatch =
+      await user.comparePassword(
+        password
+      );
+
     if (!isMatch) {
-      throw new ApiError(400, "Invalid credentials");
+      throw new ApiError(
+        400,
+        "Invalid credentials"
+      );
     }
 
-    if (user.role === "doctor" && user.profileId?.status !== "approved") {
+    if (
+      user.role ===
+        "doctor" &&
+      user.profileId
+        ?.status !==
+        "approved"
+    ) {
       throw new ApiError(
         403,
-        "Your account is pending approval from the hospital.",
+        "Your account is pending approval from the hospital."
       );
     }
 
     return {
-      token: this.generateToken(user._id),
+      token:
+        this.generateToken(
+          user._id
+        ),
+
       user: {
         id: user._id,
-        email: user.email,
-        role: user.role,
-        profile: user.profileId,
+        email:
+          user.email,
+        role:
+          user.role,
+        profile:
+          user.profileId,
       },
     };
   }
 
-  static async getCurrentUser(authenticatedUserId) {
-    const user = await User.findById(authenticatedUserId).populate("profileId");
+  // Get Current User
+  static async getCurrentUser(
+    authenticatedUserId
+  ) {
+    const user =
+      await User.findById(
+        authenticatedUserId
+      ).populate(
+        "profileId"
+      );
+
     if (!user) {
-      throw new ApiError(404, "User not found");
+      throw new ApiError(
+        404,
+        "User not found"
+      );
     }
 
     return {
       user: {
         id: user._id,
-        email: user.email,
-        role: user.role,
-        profile: user.profileId,
+        email:
+          user.email,
+        role:
+          user.role,
+        profile:
+          user.profileId,
       },
     };
   }
 
-  static async resetPassword(payload) {
-    const { email, newPassword } = payload;
+  // Reset Password
+  static async resetPassword(
+    payload
+  ) {
+    const {
+      email,
+      newPassword,
+    } = payload;
 
-    const user = await User.findOne({ email });
+    const user =
+      await User.findOne({
+        email,
+      }).select(
+        "+password"
+      );
+
     if (!user) {
-      throw new ApiError(404, "No account found with this email address");
+      throw new ApiError(
+        404,
+        "No account found with this email address"
+      );
     }
 
-    user.password = newPassword;
+    user.password =
+      newPassword;
+
     await user.save();
 
     return {
       message:
-        "Password reset successfully. You can now login with your new password.",
+        "Password reset successfully.",
     };
   }
 
-  static async getUserById(userId) {
-    const user = await User.findById(userId).populate("profileId");
+  // Get User By ID
+  static async getUserById(
+    userId
+  ) {
+    const user =
+      await User.findById(
+        userId
+      ).populate(
+        "profileId"
+      );
 
     if (!user) {
-      throw new ApiError(404, "User not found");
+      throw new ApiError(
+        404,
+        "User not found"
+      );
     }
 
     return {
       user: {
         id: user._id,
-        email: user.email,
-        role: user.role,
-        profile: user.profileId,
+        email:
+          user.email,
+        role:
+          user.role,
+        profile:
+          user.profileId,
       },
     };
   }
