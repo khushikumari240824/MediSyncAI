@@ -25,5 +25,7 @@ app.use("/api/doctors", require("./routes/doctors"));
 app.use("/api/appointments", require("./routes/appointments"));
 app.use("/api/medical-records", require("./routes/medicalRecords"));
 app.use("/api/hospital", require("./routes/hospital"));
+// AI routes
+app.use('/api/ai', require('./routes/ai.routes'));
 
 module.exports = app;
