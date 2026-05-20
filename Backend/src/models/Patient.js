@@ -45,9 +45,9 @@ const patientSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       unique: true,
       sparse: true,
     },
@@ -56,6 +56,19 @@ const patientSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+patientSchema.pre('save', async function (next) {
+  if (!this.user) return next();
+  try {
+    const User = mongoose.model('User');
+    const user = await User.findById(this.user).select('+role');
+    if (!user) return next(new Error('Associated user not found'));
+    if (user.role !== 'patient') return next(new Error('Linked user must have role "patient"'));
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+});
 
 module.exports =
   mongoose.models.Patient || mongoose.model("Patient", patientSchema);
