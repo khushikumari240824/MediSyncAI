@@ -3,6 +3,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const rateLimit = require("express-rate-limit");
+const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
 
@@ -33,5 +34,8 @@ app.use("/api/appointments", require("./routes/appointments"));
 app.use("/api/medical-records", require("./routes/medicalRecords"));
 app.use("/api/hospital", require("./routes/hospital"));
 app.use("/api/ai", require("./routes/ai.routes"));
+
+// Centralized JSON error responses
+app.use(errorHandler);
 
 module.exports = app;

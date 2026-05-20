@@ -249,9 +249,14 @@ class UserService {
       password,
     } = payload;
 
+    const normalizedEmail =
+      typeof email === "string"
+        ? email.trim().toLowerCase()
+        : email;
+
     const user =
       await User.findOne({
-        email,
+        email: normalizedEmail,
       })
         .select(
           "+password"
