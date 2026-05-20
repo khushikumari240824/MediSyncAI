@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
   {
@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+
     email: {
       type: String,
       required: true,
@@ -15,35 +16,61 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+
     password: {
       type: String,
       required: true,
       minlength: 6,
       select: false,
     },
+
     role: {
       type: String,
-      enum: ['admin', 'doctor', 'patient', 'receptionist', 'labTechnician'],
+      enum: [
+        "admin",
+        "doctor",
+        "patient",
+        "receptionist",
+        "labTechnician",
+        "hospital",
+      ],
       required: true,
     },
+
+    // Dynamic reference to Patient/Doctor/Hospital profile
+    profileId: {
+      type: mongoose.Schema.Types.ObjectId,
+      refPath: "roleModel",
+    },
+
+    roleModel: {
+      type: String,
+      enum: ["Patient", "Doctor", "Hospital"],
+    },
+
     profileImage: {
       type: String,
-      default: '',
+      default: "",
     },
+
     phoneNumber: {
       type: String,
     },
+
     gender: {
       type: String,
-      enum: ['male', 'female', 'other'],
+      enum: ["male", "female", "other"],
     },
+
     dateOfBirth: {
       type: Date,
     },
+
     isVerified: {
       type: Boolean,
       default: false,
     },
+
     isBlocked: {
       type: Boolean,
       default: false,
@@ -51,6 +78,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+
     toJSON: {
       virtuals: true,
       transform(doc, ret) {
@@ -59,23 +87,41 @@ const userSchema = new mongoose.Schema(
         return ret;
       },
     },
-    toObject: { virtuals: true },
-  },
+
+    toObject: {
+      virtuals: true,
+    },
+  }
 );
 
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+// Hash password before save
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+
   try {
     const saltRounds = 10;
-    this.password = await bcrypt.hash(this.password, saltRounds);
-    return next();
-  } catch (err) {
-    return next(err);
+    this.password = await bcrypt.hash(
+      this.password,
+      saltRounds
+    );
+
+    next();
+  } catch (error) {
+    next(error);
   }
 });
 
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
-};
+// Compare password during login
+userSchema.methods.comparePassword =
+  async function (candidatePassword) {
+    return bcrypt.compare(
+      candidatePassword,
+      this.password
+    );
+  };
 
-module.exports = mongoose.models.User || mongoose.model('User', userSchema);
+module.exports =
+  mongoose.models.User ||
+  mongoose.model("User", userSchema);
