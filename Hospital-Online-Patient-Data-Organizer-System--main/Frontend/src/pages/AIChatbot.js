@@ -69,7 +69,14 @@ const AIChatbot = () => {
       }
     } catch (err) {
       console.error("AI chat error:", err);
-      setError(err.response?.data?.message || err.message || "Request failed");
+      const status = err.response?.status;
+      if (status === 404) {
+        setError(
+          'API not found (404). Ensure `REACT_APP_BACKEND` is set to your backend URL in the deployment environment and the backend exposes /api/ai/chat.'
+        );
+      } else {
+        setError(err.response?.data?.message || err.message || "Request failed");
+      }
     } finally {
       setLoading(false);
     }
