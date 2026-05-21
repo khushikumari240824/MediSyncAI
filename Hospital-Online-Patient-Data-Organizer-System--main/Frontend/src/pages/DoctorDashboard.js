@@ -91,6 +91,7 @@ const DoctorDashboard = () => {
     localStorage.setItem("doctorDashboardTab", newValue);
   };
   const [message, setMessage] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     const loadData = () => {
@@ -208,7 +209,9 @@ const DoctorDashboard = () => {
         fd.append("treatment", reportData.treatment || "");
         fd.append("notes", reportData.notes || "");
         await api.post("/medical-records/upload", fd, {
-          headers: { "Content-Type": "multipart/form-data" },
+          onUploadProgress: (e) => {
+            if (e.total) setUploadProgress(Math.round((e.loaded * 100) / e.total));
+          },
         });
       } else {
         await api.post("/medical-records", reportData);
@@ -218,11 +221,13 @@ const DoctorDashboard = () => {
       setReportData({ patientId: "", diagnosis: "", treatment: "", notes: "", file: null });
       fetchMedicalRecords();
     } catch (error) {
-      console.log(error);
-      setMessage(
-        "Error creating report: " +
-          (error.response?.data?.message || error.message),
-      );
+      // Log full response for debugging
+      console.error("Create report error response:", error.response || error);
+      const serverData = error.response?.data;
+      const serverMsg = serverData
+        ? JSON.stringify(serverData)
+        : error.message || "Unknown error";
+      setMessage(`Error creating report: ${serverMsg}`);
     }
   };
 
