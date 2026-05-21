@@ -30,15 +30,15 @@ function App() {
               path="/patient"
               element={
                 <PrivateRoute allowedRoles={['patient']}>
+                  <PatientDashboard />
+                </PrivateRoute>
+              }
+            />
             <Route
               path="/ai-chat"
               element={
                 <PrivateRoute allowedRoles={["patient","doctor","hospital"]}>
                   <AIChatbot />
-                </PrivateRoute>
-              }
-            />
-                  <PatientDashboard />
                 </PrivateRoute>
               }
             />
