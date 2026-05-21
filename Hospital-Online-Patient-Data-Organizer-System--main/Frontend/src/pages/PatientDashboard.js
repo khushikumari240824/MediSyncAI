@@ -120,12 +120,37 @@ const PatientDashboard = () => {
 
   // Helpers for compatibility with new backend shapes
   const getDoctor = (item) => item.doctor || item.doctorId || null;
+  const isValidDate = (d) => d instanceof Date && !isNaN(d.getTime());
+
   const getScheduledAt = (apt) => {
     if (!apt) return null;
-    if (apt.scheduledAt) return new Date(apt.scheduledAt);
-    if (apt.appointmentDate && apt.appointmentTime)
-      return new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
-    if (apt.appointmentDate) return new Date(apt.appointmentDate);
+
+    // Try scheduledAt in multiple shapes (ISO string, Date, Mongo extended JSON)
+    if (apt.scheduledAt) {
+      const raw = apt.scheduledAt;
+      let dt = null;
+      if (raw instanceof Date) dt = raw;
+      else if (typeof raw === "string") dt = new Date(raw);
+      else if (raw.$date) dt = new Date(raw.$date);
+
+      if (isValidDate(dt)) return dt;
+    }
+
+    // Fallback to appointmentDate + appointmentTime
+    if (apt.appointmentDate && apt.appointmentTime) {
+      const datePart = apt.appointmentDate.includes("T")
+        ? apt.appointmentDate.split("T")[0]
+        : apt.appointmentDate;
+      const combined = `${datePart}T${apt.appointmentTime}`;
+      const dt = new Date(combined);
+      if (isValidDate(dt)) return dt;
+    }
+
+    if (apt.appointmentDate) {
+      const dt = new Date(apt.appointmentDate);
+      if (isValidDate(dt)) return dt;
+    }
+
     return null;
   };
 
