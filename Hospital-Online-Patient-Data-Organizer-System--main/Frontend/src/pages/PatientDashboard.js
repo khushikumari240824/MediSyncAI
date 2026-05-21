@@ -118,6 +118,17 @@ const PatientDashboard = () => {
     }
   };
 
+  // Helpers for compatibility with new backend shapes
+  const getDoctor = (item) => item.doctor || item.doctorId || null;
+  const getScheduledAt = (apt) => {
+    if (!apt) return null;
+    if (apt.scheduledAt) return new Date(apt.scheduledAt);
+    if (apt.appointmentDate && apt.appointmentTime)
+      return new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
+    if (apt.appointmentDate) return new Date(apt.appointmentDate);
+    return null;
+  };
+
   const handleBookAppointment = async () => {
     try {
       await api.post("/appointments", appointmentData);
@@ -157,11 +168,16 @@ const PatientDashboard = () => {
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
+      case "scheduled":
       case "confirmed":
+      case "completed":
         return "success";
       case "pending":
+      case "checked-in":
+      case "in-progress":
         return "warning";
       case "cancelled":
+      case "no-show":
         return "error";
       default:
         return "default";
@@ -381,12 +397,17 @@ const PatientDashboard = () => {
                             fontWeight={600}
                             color="text.primary"
                           >
-                            {new Date(
-                              appointment.appointmentDate,
-                            ).toLocaleDateString()}
+                            {getScheduledAt(appointment)
+                              ? getScheduledAt(appointment).toLocaleDateString()
+                              : "-"}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
-                            {appointment.appointmentTime}
+                            {getScheduledAt(appointment)
+                              ? getScheduledAt(appointment).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
+                              : appointment.appointmentTime || "-"}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -405,7 +426,7 @@ const PatientDashboard = () => {
                                 color: "primary.main",
                               }}
                             >
-                              {appointment.doctorId?.firstName?.[0]}
+                              {getDoctor(appointment)?.firstName?.[0]}
                             </Avatar>
                             <Box>
                               <Typography
@@ -413,14 +434,14 @@ const PatientDashboard = () => {
                                 fontWeight={600}
                                 color="text.primary"
                               >
-                                Dr. {appointment.doctorId?.firstName}{" "}
-                                {appointment.doctorId?.lastName}
+                                Dr. {getDoctor(appointment)?.firstName} {" "}
+                                {getDoctor(appointment)?.lastName}
                               </Typography>
                               <Typography
                                 variant="caption"
                                 color="text.secondary"
                               >
-                                {appointment.doctorId?.specialization}
+                                {getDoctor(appointment)?.specialization}
                               </Typography>
                             </Box>
                           </Box>
@@ -531,9 +552,9 @@ const PatientDashboard = () => {
                             fontWeight={600}
                             color="text.primary"
                           >
-                            {new Date(
-                              appointment.appointmentDate,
-                            ).toLocaleDateString()}
+                            {getScheduledAt(appointment)
+                              ? getScheduledAt(appointment).toLocaleDateString()
+                              : "-"}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -555,11 +576,11 @@ const PatientDashboard = () => {
                                 color: "text.secondary",
                               }}
                             >
-                              {appointment.doctorId?.firstName?.[0]}
+                              {getDoctor(appointment)?.firstName?.[0]}
                             </Avatar>
                             <Typography variant="body2" fontWeight={500}>
-                              Dr. {appointment.doctorId?.firstName}{" "}
-                              {appointment.doctorId?.lastName}
+                              Dr. {getDoctor(appointment)?.firstName} {" "}
+                              {getDoctor(appointment)?.lastName}
                             </Typography>
                           </Box>
                         </TableCell>
@@ -718,19 +739,19 @@ const PatientDashboard = () => {
                                 fontSize: "0.875rem",
                               }}
                             >
-                              {record.doctorId?.firstName?.[0]}
+                              {getDoctor(record)?.firstName?.[0]}
                             </Avatar>
                             <Box>
                               <Typography variant="body2" fontWeight={600}>
-                                Dr. {record.doctorId?.firstName}{" "}
-                                {record.doctorId?.lastName}
+                                Dr. {getDoctor(record)?.firstName}{" "}
+                                {getDoctor(record)?.lastName}
                               </Typography>
                             </Box>
                           </Box>
                         </TableCell>
                         <TableCell>
-                          <Chip
-                            label={record.doctorId?.specialization || "N/A"}
+                            <Chip
+                            label={getDoctor(record)?.specialization || "N/A"}
                             size="small"
                             color="primary"
                             variant="outlined"
@@ -953,11 +974,11 @@ const PatientDashboard = () => {
                           Doctor
                         </Typography>
                         <Typography variant="body1" fontWeight={600}>
-                          Dr. {selectedAppointment.doctorId?.firstName}{" "}
-                          {selectedAppointment.doctorId?.lastName}
+                          Dr. {getDoctor(selectedAppointment)?.firstName} {" "}
+                          {getDoctor(selectedAppointment)?.lastName}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          {selectedAppointment.doctorId?.specialization}
+                          {getDoctor(selectedAppointment)?.specialization}
                         </Typography>
                       </Grid>
                     </Grid>

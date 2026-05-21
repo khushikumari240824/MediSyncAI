@@ -75,6 +75,10 @@ const DoctorDashboard = () => {
     treatment: "",
     notes: "",
   });
+
+  // allow attaching a file for uploads
+  // `file` will be a File object when selected
+  // keep it inside reportData as `file`
   const [selectedPatientHistory, setSelectedPatientHistory] = useState(null);
 
   const [tabValue, setTabValue] = useState(() => {
@@ -116,6 +120,18 @@ const DoctorDashboard = () => {
     } catch (error) {
       console.error("Error fetching medical records:", error);
     }
+  };
+
+  // Helpers to support both old and new backend field names
+  const getPatient = (item) => item.patient || item.patientId || null;
+  const getDoctor = (item) => item.doctor || item.doctorId || null;
+  const getScheduledAt = (apt) => {
+    if (!apt) return null;
+    if (apt.scheduledAt) return new Date(apt.scheduledAt);
+    if (apt.appointmentDate && apt.appointmentTime)
+      return new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
+    if (apt.appointmentDate) return new Date(apt.appointmentDate);
+    return null;
   };
 
   // --- Actions ---
@@ -161,10 +177,22 @@ const DoctorDashboard = () => {
 
   const handleCreateReport = async () => {
     try {
-      await api.post("/medical-records", reportData);
+      if (reportData.file) {
+        const fd = new FormData();
+        fd.append("file", reportData.file);
+        fd.append("patientId", reportData.patientId);
+        fd.append("diagnosis", reportData.diagnosis || "");
+        fd.append("treatment", reportData.treatment || "");
+        fd.append("notes", reportData.notes || "");
+        await api.post("/medical-records/upload", fd, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      } else {
+        await api.post("/medical-records", reportData);
+      }
       setMessage("Medical report created successfully!");
       setOpenReport(false);
-      setReportData({ patientId: "", diagnosis: "", treatment: "", notes: "" });
+      setReportData({ patientId: "", diagnosis: "", treatment: "", notes: "", file: null });
       fetchMedicalRecords();
     } catch (error) {
       console.log(error);
@@ -179,12 +207,8 @@ const DoctorDashboard = () => {
     // In a real app, you might fetch specific history here.
     // For now, we filter existing loaded data for simplicity,
     // but ideally we should hit an endpoint like /api/patients/:id/history
-    const patientAppointments = appointments.filter(
-      (a) => a.patientId?._id === patientId,
-    );
-    const patientRecords = medicalRecords.filter(
-      (r) => r.patientId?._id === patientId,
-    );
+    const patientAppointments = appointments.filter((a) => getPatient(a)?._id === patientId);
+    const patientRecords = medicalRecords.filter((r) => (r.patient || r.patientId)?._id === patientId);
 
     setSelectedPatientHistory({
       appointments: patientAppointments,
@@ -200,11 +224,16 @@ const DoctorDashboard = () => {
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
+      case "scheduled":
       case "confirmed":
+      case "completed":
         return "success";
       case "pending":
+      case "checked-in":
+      case "in-progress":
         return "warning";
       case "cancelled":
+      case "no-show":
         return "error";
       default:
         return "default";
@@ -435,9 +464,9 @@ const DoctorDashboard = () => {
                             fontWeight={600}
                             color="text.primary"
                           >
-                            {new Date(
-                              appointment.appointmentDate,
-                            ).toLocaleDateString()}
+                            {getScheduledAt(appointment)
+                              ? getScheduledAt(appointment).toLocaleDateString()
+                              : "-"}
                           </Typography>
                           <Typography
                             variant="caption"
@@ -449,7 +478,12 @@ const DoctorDashboard = () => {
                             }}
                           >
                             <Schedule sx={{ fontSize: 14 }} />{" "}
-                            {appointment.appointmentTime}
+                            {getScheduledAt(appointment)
+                              ? getScheduledAt(appointment).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
+                              : appointment.appointmentTime || "-"}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -469,18 +503,18 @@ const DoctorDashboard = () => {
                                 fontWeight: 700,
                               }}
                             >
-                              {appointment.patientId?.firstName?.[0]}
+                              {getPatient(appointment)?.firstName?.[0]}
                             </Avatar>
                             <Box>
                               <Typography variant="body2" fontWeight={600}>
-                                {appointment.patientId?.firstName}{" "}
-                                {appointment.patientId?.lastName}
+                                {getPatient(appointment)?.firstName} {" "}
+                                {getPatient(appointment)?.lastName}
                               </Typography>
                               <Typography
                                 variant="caption"
                                 color="text.secondary"
                               >
-                                {appointment.patientId?.phone}
+                                {getPatient(appointment)?.phone}
                               </Typography>
                             </Box>
                           </Box>
@@ -516,7 +550,7 @@ const DoctorDashboard = () => {
                               onClick={() =>
                                 handleStatusChange(appointment._id, "confirmed")
                               }
-                              disabled={appointment.status !== "pending"}
+                              disabled={!(appointment.status === "pending" || appointment.status === "scheduled")}
                               sx={{ borderRadius: "8px" }}
                             >
                               Confirm
@@ -534,7 +568,7 @@ const DoctorDashboard = () => {
                             <IconButton
                               size="small"
                               onClick={() =>
-                                viewPatientHistory(appointment.patientId?._id)
+                                viewPatientHistory(getPatient(appointment)?._id)
                               }
                               sx={{ color: "text.secondary" }}
                             >
@@ -639,11 +673,11 @@ const DoctorDashboard = () => {
                                 color: "secondary.main",
                               }}
                             >
-                              {record.patientId?.firstName?.[0]}
+                              {(record.patient || record.patientId)?.firstName?.[0]}
                             </Avatar>
                             <Typography variant="body2" fontWeight={600}>
-                              {record.patientId?.firstName}{" "}
-                              {record.patientId?.lastName}
+                                {(record.patient || record.patientId)?.firstName} {" "}
+                                {(record.patient || record.patientId)?.lastName}
                             </Typography>
                           </Box>
                         </TableCell>
@@ -755,8 +789,8 @@ const DoctorDashboard = () => {
             {[
               ...new Map(
                 appointments.map((item) => [
-                  item.patientId?._id,
-                  item.patientId,
+                  getPatient(item)?._id,
+                  getPatient(item),
                 ]),
               ).values(),
             ]
@@ -776,6 +810,16 @@ const DoctorDashboard = () => {
             }
             margin="normal"
           />
+          <Box sx={{ mt: 1, mb: 1 }}>
+            <input
+              id="report-file"
+              type="file"
+              accept="image/*,application/pdf"
+              onChange={(e) =>
+                setReportData({ ...reportData, file: e.target.files[0] })
+              }
+            />
+          </Box>
           <TextField
             fullWidth
             label="Treatment Plan"
@@ -827,7 +871,9 @@ const DoctorDashboard = () => {
                     <React.Fragment key={apt._id}>
                       <ListItem alignItems="flex-start">
                         <ListItemText
-                          primary={`${new Date(apt.appointmentDate).toLocaleDateString()} - ${apt.status}`}
+                          primary={`${getScheduledAt(apt)
+                            ? getScheduledAt(apt).toLocaleDateString()
+                            : "-"} - ${apt.status}`}
                           secondary={
                             <React.Fragment>
                               <Typography

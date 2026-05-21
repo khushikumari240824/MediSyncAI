@@ -94,6 +94,18 @@ const HospitalDashboard = () => {
     }
   };
 
+  // Helpers to support both old and new backend field names
+  const getPatient = (item) => item.patient || item.patientId || null;
+  const getDoctor = (item) => item.doctor || item.doctorId || null;
+  const getScheduledAt = (apt) => {
+    if (!apt) return null;
+    if (apt.scheduledAt) return new Date(apt.scheduledAt);
+    if (apt.appointmentDate && apt.appointmentTime)
+      return new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
+    if (apt.appointmentDate) return new Date(apt.appointmentDate);
+    return null;
+  };
+
   const handleLogout = () => {
     logout();
     navigate("/login");
@@ -101,11 +113,16 @@ const HospitalDashboard = () => {
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
+      case "scheduled":
       case "confirmed":
+      case "completed":
         return "success";
       case "pending":
+      case "checked-in":
+      case "in-progress":
         return "warning";
       case "cancelled":
+      case "no-show":
         return "error";
       default:
         return "default";
@@ -372,47 +389,47 @@ const HospitalDashboard = () => {
                           {new Date(patient.dateOfBirth).toLocaleDateString()}
                         </TableCell>
                         <TableCell sx={{ textTransform: "capitalize" }}>
-                          {patient.gender}
-                        </TableCell>
-                        <TableCell>{patient.phone}</TableCell>
-                        <TableCell>
-                          {patient.bloodGroup ? (
-                            <Chip
-                              label={patient.bloodGroup}
-                              size="small"
-                              color="error"
-                              variant="outlined"
-                              sx={{ fontWeight: 600 }}
-                            />
-                          ) : (
-                            "-"
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {patients.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "center",
-                              opacity: 0.5,
-                            }}
-                          >
-                            <People sx={{ fontSize: 48, mb: 1 }} />
-                            <Typography variant="h6">
-                              No patients found
-                            </Typography>
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
+                          {/* Patient Column */}
+                          <TableCell>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1.5,
+                              }}
+                            >
+                              <Avatar
+                                sx={{
+                                  width: 40,
+                                  height: 40,
+                                  bgcolor: alpha(theme.palette.success.main, 0.1),
+                                  color: "success.main",
+                                  fontSize: "1rem",
+                                }}
+                              >
+                                {(record.patient || record.patientId)?.firstName?.[0]}
+                              </Avatar>
+                              <Box>
+                                <Typography
+                                  variant="subtitle2"
+                                  fontWeight={600}
+                                  color="text.primary"
+                                >
+                                  {(record.patient || record.patientId)?.firstName}{" "}
+                                  {(record.patient || record.patientId)?.lastName}
+                                </Typography>
+                                <Typography
+                                  variant="caption"
+                                  display="block"
+                                  color="text.secondary"
+                                >
+                                  ID: {(record.patient || record.patientId)?._id
+                                    ?.slice(-8)
+                                    .toUpperCase() || "N/A"}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </TableCell>
           )}
 
           {/* Doctors Tab */}
@@ -694,24 +711,29 @@ const HospitalDashboard = () => {
                             fontWeight={600}
                             color="text.primary"
                           >
-                            {new Date(
-                              appointment.appointmentDate,
-                            ).toLocaleDateString()}
+                            {getScheduledAt(appointment)
+                              ? getScheduledAt(appointment).toLocaleDateString()
+                              : "-"}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
-                            {appointment.appointmentTime}
+                            {getScheduledAt(appointment)
+                              ? getScheduledAt(appointment).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
+                              : appointment.appointmentTime || "-"}
                           </Typography>
                         </TableCell>
                         <TableCell>
                           <Typography variant="body2">
-                            {appointment.patientId?.firstName}{" "}
-                            {appointment.patientId?.lastName}
+                            {getPatient(appointment)?.firstName} {" "}
+                            {getPatient(appointment)?.lastName}
                           </Typography>
                         </TableCell>
                         <TableCell>
                           <Typography variant="body2" fontWeight={500}>
-                            Dr. {appointment.doctorId?.firstName}{" "}
-                            {appointment.doctorId?.lastName}
+                            Dr. {getDoctor(appointment)?.firstName} {" "}
+                            {getDoctor(appointment)?.lastName}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -839,7 +861,7 @@ const HospitalDashboard = () => {
                                 fontSize: "1rem",
                               }}
                             >
-                              {record.patientId?.firstName?.[0]}
+                              {(record.patient || record.patientId)?.firstName?.[0]}
                             </Avatar>
                             <Box>
                               <Typography
@@ -847,8 +869,8 @@ const HospitalDashboard = () => {
                                 fontWeight={600}
                                 color="text.primary"
                               >
-                                {record.patientId?.firstName}{" "}
-                                {record.patientId?.lastName}
+                                {(record.patient || record.patientId)?.firstName}{" "}
+                                {(record.patient || record.patientId)?.lastName}
                               </Typography>
                               <Typography
                                 variant="caption"
@@ -856,7 +878,7 @@ const HospitalDashboard = () => {
                                 color="text.secondary"
                               >
                                 ID:{" "}
-                                {record.patientId?._id
+                                {(record.patient || record.patientId)?._id
                                   ?.slice(-8)
                                   .toUpperCase() || "N/A"}
                               </Typography>
@@ -881,7 +903,7 @@ const HospitalDashboard = () => {
                                 fontSize: "1rem",
                               }}
                             >
-                              {record.doctorId?.firstName?.[0]}
+                              {getDoctor(record)?.firstName?.[0]}
                             </Avatar>
                             <Box>
                               <Typography
@@ -889,22 +911,22 @@ const HospitalDashboard = () => {
                                 fontWeight={600}
                                 color="text.primary"
                               >
-                                Dr. {record.doctorId?.firstName}{" "}
-                                {record.doctorId?.lastName}
+                                Dr. {getDoctor(record)?.firstName}{" "}
+                                {getDoctor(record)?.lastName}
                               </Typography>
                               <Typography
                                 variant="caption"
                                 display="block"
                                 color="text.secondary"
                               >
-                                {record.doctorId?.specialization || "General"}
+                                {getDoctor(record)?.specialization || "General"}
                               </Typography>
                             </Box>
                           </Box>
                         </TableCell>
                         <TableCell>
                           <Chip
-                            label={record.doctorId?.specialization || "N/A"}
+                            label={getDoctor(record)?.specialization || "N/A"}
                             size="small"
                             color="default"
                             variant="outlined"
