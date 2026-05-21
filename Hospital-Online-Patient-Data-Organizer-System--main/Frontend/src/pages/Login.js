@@ -48,6 +48,14 @@ const Login = () => {
     const result = await login(email, password);
     if (result.success && result.user) {
       const role = result.user.role;
+      // If user authenticated as a different role than the portal selected,
+      // show a clear error so users don't get silently redirected to the wrong dashboard.
+      if (selectedRole && selectedRole !== role) {
+        setError(
+          `Logged in as ${role}. Please use the ${role} portal or choose the correct portal before signing in.`,
+        );
+        return;
+      }
       navigate(`/${role}`);
     } else {
       setError(result.message);
