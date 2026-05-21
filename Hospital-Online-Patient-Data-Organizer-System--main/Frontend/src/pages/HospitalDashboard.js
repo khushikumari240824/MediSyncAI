@@ -389,47 +389,16 @@ const HospitalDashboard = () => {
                           {new Date(patient.dateOfBirth).toLocaleDateString()}
                         </TableCell>
                         <TableCell sx={{ textTransform: "capitalize" }}>
-                          {/* Patient Column */}
-                          <TableCell>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1.5,
-                              }}
-                            >
-                              <Avatar
-                                sx={{
-                                  width: 40,
-                                  height: 40,
-                                  bgcolor: alpha(theme.palette.success.main, 0.1),
-                                  color: "success.main",
-                                  fontSize: "1rem",
-                                }}
-                              >
-                                {(record.patient || record.patientId)?.firstName?.[0]}
-                              </Avatar>
-                              <Box>
-                                <Typography
-                                  variant="subtitle2"
-                                  fontWeight={600}
-                                  color="text.primary"
-                                >
-                                  {(record.patient || record.patientId)?.firstName}{" "}
-                                  {(record.patient || record.patientId)?.lastName}
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  display="block"
-                                  color="text.secondary"
-                                >
-                                  ID: {(record.patient || record.patientId)?._id
-                                    ?.slice(-8)
-                                    .toUpperCase() || "N/A"}
-                                </Typography>
-                              </Box>
-                            </Box>
-                          </TableCell>
+                          {patient.gender || "-"}
+                        </TableCell>
+                        <TableCell>{patient.phone || "-"}</TableCell>
+                        <TableCell>{patient.bloodGroup || "-"}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
           )}
 
           {/* Doctors Tab */}

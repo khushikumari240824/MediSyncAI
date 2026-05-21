@@ -84,7 +84,8 @@ export const AuthProvider = ({ children }) => {
         errorMessage = error.message;
       }
 
-      toast.error(errorMessage);
+      // Show inline errors in the calling component (e.g. Register page)
+      // Keep toast for successes only to avoid duplicate error notifications
       return {
         success: false,
         message: errorMessage,

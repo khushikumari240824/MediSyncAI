@@ -5,6 +5,14 @@
     "Frontend",
     "Backend"
   ],
+  "scripts": {
+    "start": "concurrently \"npm:backend\" \"npm:frontend\"",
+    "backend": "npm --workspace Backend run start",
+    "frontend": "npm --workspace Frontend run start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "cloudinary": "^2.10.0",
