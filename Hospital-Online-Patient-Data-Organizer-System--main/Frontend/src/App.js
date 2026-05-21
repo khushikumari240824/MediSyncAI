@@ -14,7 +14,7 @@ import HospitalDashboard from './pages/HospitalDashboard';
 import Profile from './pages/Profile';
 import HomePage from './pages/HomePage';
 import AIChatbot from './pages/AIChatbot';
-import theme from './theme';
+// theme import removed (unused in this file)
 
 function App() {
   return (

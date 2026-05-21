@@ -27,6 +27,7 @@ import {
   Grid,
   Chip,
   Avatar,
+  LinearProgress,
   IconButton,
   List,
   ListItem,
@@ -128,7 +129,6 @@ const DoctorDashboard = () => {
 
   // Helpers to support both old and new backend field names
   const getPatient = (item) => item.patient || item.patientId || null;
-  const getDoctor = (item) => item.doctor || item.doctorId || null;
   const isValidDate = (d) => d instanceof Date && !isNaN(d.getTime());
 
   const getRecordTypeFromFile = (file) => {
@@ -934,6 +934,14 @@ const DoctorDashboard = () => {
               }
             />
           </Box>
+          {uploadProgress > 0 && (
+            <Box sx={{ mt: 1, mb: 1 }}>
+              <LinearProgress variant="determinate" value={uploadProgress} />
+              <Typography variant="caption" color="text.secondary">
+                Upload progress: {uploadProgress}%
+              </Typography>
+            </Box>
+          )}
           <TextField
             fullWidth
             label="Treatment Plan"
