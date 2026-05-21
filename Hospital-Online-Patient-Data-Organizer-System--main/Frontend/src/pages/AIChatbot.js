@@ -52,6 +52,14 @@ const AIChatbot = () => {
 
     try {
       const payload = { messages: nextMessages.filter(m => m.role !== 'system') };
+      // Debug: log the resolved base URL and full request info
+      try {
+        // api.defaults.baseURL may be undefined in some builds; guard it
+        // eslint-disable-next-line no-console
+        console.log('AI request ->', (api.defaults && api.defaults.baseURL) ? `${api.defaults.baseURL}/ai/chat` : '/api/ai/chat', payload);
+      } catch (e) {
+        // ignore logging errors
+      }
       const response = await api.post("/ai/chat", payload);
       const reply = response.data?.reply;
       if (reply && reply.content) {
