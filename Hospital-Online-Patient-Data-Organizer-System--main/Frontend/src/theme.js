@@ -1,8 +1,8 @@
 import { createTheme } from '@mui/material/styles';
 
-const theme = createTheme({
+const buildTheme = (mode = 'light') => createTheme({
     palette: {
-        mode: 'light',
+        mode,
         primary: {
             main: '#0ea5e9', // Vibrant Sky Blue
             light: '#7dd3fc',
@@ -15,11 +15,17 @@ const theme = createTheme({
             dark: '#047857',
             contrastText: '#ffffff',
         },
-        background: {
+        background: mode === 'dark' ? {
+            default: '#0b1220',
+            paper: '#08101a'
+        } : {
             default: '#f8fafc', // Modern Slate Background
             paper: '#ffffff',
         },
-        text: {
+        text: mode === 'dark' ? {
+            primary: '#e6eef8',
+            secondary: '#9fb3c8'
+        } : {
             primary: '#0f172a', // Slate 900
             secondary: '#64748b', // Slate 500
         },
@@ -88,8 +94,8 @@ const theme = createTheme({
             styleOverrides: {
                 root: {
                     borderRadius: '24px',
-                    background: '#ffffff',
-                    border: '1px solid rgba(148, 163, 184, 0.1)',
+                    background: mode === 'dark' ? '#071022' : '#ffffff',
+                    border: mode === 'dark' ? '1px solid rgba(255,255,255,0.02)' : '1px solid rgba(148, 163, 184, 0.1)',
                     boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 },
@@ -101,21 +107,21 @@ const theme = createTheme({
                     borderRadius: '24px',
                 },
                 elevation1: {
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    boxShadow: mode === 'dark' ? '0 6px 14px -6px rgba(0,0,0,0.6)' : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
                 },
                 elevation24: {
-                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                    boxShadow: mode === 'dark' ? '0 20px 40px -10px rgba(0,0,0,0.6)' : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
                 }
             }
         },
         MuiAppBar: {
             styleOverrides: {
                 root: {
-                    background: 'rgba(255, 255, 255, 0.8)',
+                    background: mode === 'dark' ? 'rgba(3,7,18,0.6)' : 'rgba(255, 255, 255, 0.8)',
                     backdropFilter: 'blur(12px)',
-                    borderBottom: '1px solid rgba(226, 232, 240, 0.8)',
+                    borderBottom: mode === 'dark' ? '1px solid rgba(255,255,255,0.03)' : '1px solid rgba(226, 232, 240, 0.8)',
                     boxShadow: 'none',
-                    color: '#0f172a',
+                    color: mode === 'dark' ? '#e6eef8' : '#0f172a',
                 },
             },
         },
@@ -129,4 +135,4 @@ const theme = createTheme({
     },
 });
 
-export default theme;
+export default buildTheme;

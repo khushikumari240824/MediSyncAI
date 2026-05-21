@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Typography, alpha, useTheme } from '@mui/material';
+import ThemeToggle from './ThemeToggle';
 const PageHeader = ({ title, subtitle, action, icon: Icon }) => {
     const theme = useTheme();
 
@@ -42,11 +43,10 @@ const PageHeader = ({ title, subtitle, action, icon: Icon }) => {
                 </Box>
             </Box>
 
-            {action && (
-                <Box sx={{ position: 'relative', zIndex: 1 }}>
-                    {action}
-                </Box>
-            )}
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', position: 'relative', zIndex: 1 }}>
+                {action}
+                <ThemeToggle />
+            </Box>
         </Box>
     );
 };
