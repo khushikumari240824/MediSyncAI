@@ -21,6 +21,7 @@ import api from "../services/api";
 
 const AIChatbot = () => {
   const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const { user } = useContext(AuthContext);
   const [messages, setMessages] = useState([
     { role: "system", content: "You are a helpful medical assistant providing clinical information. Be concise and safe." },
@@ -93,6 +94,33 @@ const AIChatbot = () => {
     setError(null);
   };
 
+  const bubbleSx = (role) => {
+    const isUser = role === 'user';
+
+    if (isUser) {
+      return {
+        maxWidth: '80%',
+        p: 1.5,
+        borderRadius: 2,
+        bgcolor: isDark
+          ? alpha(theme.palette.primary.main, 0.22)
+          : alpha(theme.palette.primary.main, 0.12),
+        color: theme.palette.text.primary,
+        border: isDark ? '1px solid rgba(125, 211, 252, 0.14)' : '1px solid rgba(14, 165, 233, 0.1)',
+      };
+    }
+
+    return {
+      maxWidth: '80%',
+      p: 1.5,
+      borderRadius: 2,
+      bgcolor: isDark ? '#0f172a' : alpha(theme.palette.grey[200], 1),
+      color: theme.palette.text.primary,
+      border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(148, 163, 184, 0.12)',
+      boxShadow: isDark ? '0 12px 28px -18px rgba(0,0,0,0.7)' : 'none',
+    };
+  };
+
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 6 }}>
@@ -114,14 +142,24 @@ const AIChatbot = () => {
           </Stack>
         </Stack>
 
-        <Box ref={listRef} sx={{ maxHeight: '60vh', overflowY: 'auto', p: 2, bgcolor: 'background.paper', borderRadius: 2 }}>
+        <Box
+          ref={listRef}
+          sx={{
+            maxHeight: '60vh',
+            overflowY: 'auto',
+            p: 2,
+            bgcolor: isDark ? 'rgba(2, 6, 23, 0.72)' : 'background.paper',
+            borderRadius: 2,
+            border: isDark ? '1px solid rgba(255,255,255,0.04)' : '1px solid rgba(148, 163, 184, 0.08)',
+          }}
+        >
           {messages.filter(m => m.role !== 'system').map((msg, idx) => (
             <Box key={idx} sx={{ display: 'flex', mb: 2, justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
               {msg.role !== 'user' && (
                 <Avatar sx={{ mr: 1, bgcolor: theme.palette.primary.light }}>{/* AI avatar */}</Avatar>
               )}
-              <Box sx={{ maxWidth: '80%', bgcolor: msg.role === 'user' ? alpha(theme.palette.primary.main, 0.12) : alpha(theme.palette.grey[200], 1), p: 1.5, borderRadius: 2 }}>
-                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{msg.content}</Typography>
+              <Box sx={bubbleSx(msg.role)}>
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', color: 'inherit' }}>{msg.content}</Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, textAlign: msg.role === 'user' ? 'right' : 'left' }}>{msg.role === 'user' ? (user?.firstName || 'You') : 'Assistant'}</Typography>
               </Box>
               {msg.role === 'user' && (
