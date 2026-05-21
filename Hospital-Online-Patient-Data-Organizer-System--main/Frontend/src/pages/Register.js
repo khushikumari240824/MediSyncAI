@@ -32,6 +32,8 @@ import { AuthContext } from '../context/AuthContext';
 const Register = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const passwordRuleMessage =
+    'Password must be at least 8 characters and include uppercase, lowercase, and a number';
   const fieldSx = {
     '& .MuiOutlinedInput-root': { bgcolor: isDark ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255,255,255,0.5)' },
   };
@@ -76,6 +78,12 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    const passwordRule = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRule.test(formData.password)) {
+      setError(passwordRuleMessage);
+      return;
+    }
 
     const result = await register(role, formData);
     if (result.success && result.user) {
@@ -186,7 +194,7 @@ const Register = () => {
           type="password"
           value={formData.password}
           onChange={handleChange}
-          helperText="Must be at least 6 characters"
+          helperText={passwordRuleMessage}
           sx={fieldSx}
         />
       </Grid>
