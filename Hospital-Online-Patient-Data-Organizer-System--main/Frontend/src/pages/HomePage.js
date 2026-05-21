@@ -100,23 +100,15 @@ const HomePage = () => {
                 <Container maxWidth="xl">
                     <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: '80px' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Box sx={{
-                                width: 45, height: 45, borderRadius: '14px',
-                                background: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                boxShadow: '0 8px 16px -4px rgba(14, 165, 233, 0.5)'
-                            }}>
-                                <LocalHospital sx={{ color: '#fff', fontSize: 28 }} />
-                            </Box>
                             <Box>
                                 <Typography variant="h6" sx={{
                                     fontWeight: 900, fontSize: '1.4rem', color: 'text.primary',
                                     letterSpacing: '-0.04em', lineHeight: 1
                                 }}>
-                                    HOPDS (Hopital online patient data management system)
+                                    MediSyncAI
                                 </Typography>
                                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                                    Precision Control
+                                    Next-Generation Healthcare Platform
                                 </Typography>
                             </Box>
                         </Box>
@@ -164,7 +156,8 @@ const HomePage = () => {
                             }}
                         />
                         <Typography variant="h1" sx={{ color: 'text.primary', mb: 3 }}>
-                            Unified Healthcare<br />
+                            MediSyncAI
+Healthcare <br />
                             <Box component="span" sx={{
                                 background: 'linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%)',
                                 WebkitBackgroundClip: 'text',
@@ -172,7 +165,11 @@ const HomePage = () => {
                             }}>Management Dashboard</Box>
                         </Typography>
                         <Typography variant="h6" sx={{ color: 'text.secondary', mb: 5, maxWidth: '700px', mx: 'auto', fontWeight: 500 }}>
-                            HOPDS (Hopital oline patient data management system) bridges the gap between clinicians, patients, and administrators with a secure, real-time data ecosystem optimized for performance.
+                            MediSyncAI bridges the gap between hospitals,
+doctors, and patients through secure,
+AI-powered healthcare management with
+real-time appointments, medical records,
+and intelligent assistance.
                         </Typography>
 
                         {/* <Grid container spacing={4} sx={{ mt: 2 }}>
@@ -230,7 +227,7 @@ const HomePage = () => {
                                             mb: 4,
                                             boxShadow: `0 12px 24px -6px ${portal.color}50`
                                         }}>
-                                            <portal.icon sx={{ color: '#fff', fontSize: 32 }} />
+                                            <portal.icon sx={{ color: theme.palette.common.white, fontSize: 32 }} />
                                         </Box>
 
                                         <Typography variant="h5" sx={{ fontWeight: 800, mb: 2, color: 'text.primary' }}>
@@ -244,7 +241,7 @@ const HomePage = () => {
                                             {portal.features.map((feat, i) => (
                                                 <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                                     <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: portal.color }} />
-                                                    <Typography variant="caption" sx={{ fontWeight: 700, color: '#334155' }}>{feat}</Typography>
+                                                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary' }}>{feat}</Typography>
                                                 </Box>
                                             ))}
                                         </Stack>
@@ -276,26 +273,29 @@ const HomePage = () => {
                             Platform Capabilities
                         </Typography>
                         <Grid container spacing={3}>
-                            {[
-                                { title: 'Unified Ledger', desc: 'Immutable medical history tracking across hospital nodes.', icon: Assignment, color: '#0ea5e9' },
-                                { title: 'Rapid Sync', desc: 'Sub-second synchronization for ultra-responsive care.', icon: Speed, color: '#10b981' },
-                                { title: 'Medical Records', desc: 'Enterprise every medical record with proper patient and doctor identity.', icon: Security, color: '#6366f1' },
-                                { title: 'Appointment Scheduling', desc: 'Appoinment scheduling by patient to doctor by ensuring date and time availability.', icon: CloudQueue, color: '#0ea5e9' }
-                            ].map((info, i) => (
-                                <Grid item xs={12} sm={6} md={3} key={i}>
-                                    <Box className="glass" sx={{
-                                        p: 4,
-                                        borderRadius: '24px',
-                                        height: '100%',
-                                        border: '1px solid rgba(255,255,255,0.4)',
-                                    }}>
-                                        <info.icon sx={{ fontSize: 40, color: info.color, mb: 2 }} />
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 1.5, color: 'text.primary' }}>{info.title}</Typography>
-                                        <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.6, display: 'block' }}>{info.desc}</Typography>
-                                    </Box>
-                                </Grid>
-                            ))}
-                        </Grid>
+                        {[
+                            { title: 'Unified Ledger', desc: 'Immutable medical history tracking across hospital nodes.', icon: Assignment, color: '#0ea5e9' },
+                            { title: 'Rapid Sync', desc: 'Sub-second synchronization for ultra-responsive care.', icon: Speed, color: '#10b981' },
+                            { title: 'Medical Records', desc: 'Enterprise every medical record with proper patient and doctor identity.', icon: Security, color: '#6366f1' },
+                            { title: 'Appointment Scheduling', desc: 'Appoinment scheduling by patient to doctor by ensuring date and time availability.', icon: CloudQueue, color: '#0ea5e9' }
+                        ].map((info, i) => (
+                            <Grid item xs={12} sm={6} md={3} key={i}>
+                                <Box sx={{
+                                    p: 4,
+                                    borderRadius: '24px',
+                                    height: '100%',
+                                    bgcolor: isDark ? 'rgba(15,23,42,0.75)' : 'rgba(255,255,255,0.95)',
+                                    backdropFilter: 'blur(8px)',
+                                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)'}`,
+                                    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.6)' : '0 8px 32px 0 rgba(31, 38, 135, 0.07)'
+                                }}>
+                                    <info.icon sx={{ fontSize: 40, color: info.color, mb: 2 }} />
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 1.5, color: 'text.primary' }}>{info.title}</Typography>
+                                    <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.6, display: 'block' }}>{info.desc}</Typography>
+                                </Box>
+                            </Grid>
+                        ))}
+                    </Grid>
                     </Box>
 
                     {/* How It Works Section */}
@@ -303,8 +303,8 @@ const HomePage = () => {
                         <Paper elevation={0} sx={{
                             p: { xs: 4, md: 8 },
                             borderRadius: '48px',
-                            bgcolor: isDark ? 'background.paper' : '#0f172a',
-                            color: isDark ? 'text.primary' : 'white',
+                            bgcolor: isDark ? theme.palette.background.paper : theme.palette.primary.dark,
+                            color: 'text.primary',
                             overflow: 'hidden',
                             position: 'relative'
                         }}>
@@ -320,7 +320,7 @@ const HomePage = () => {
                                         Engineered for <br />
                                         <Box component="span" sx={{ color: 'primary.light' }}>Performance</Box>
                                     </Typography>
-                                    <Typography variant="body1" sx={{ color: isDark ? 'text.secondary' : 'rgba(255,255,255,0.7)', mb: 6 }}>
+                                    <Typography variant="body1" sx={{ color: isDark ? 'text.secondary' : theme.palette.common.white, mb: 6 }}>
                                         Our architecture prioritize interoperability and zero-latency data access, ensuring that life-critical information is always where it belongs: in the hands of care providers.
                                     </Typography>
                                     <Stack spacing={4}>
@@ -340,32 +340,33 @@ const HomePage = () => {
                                                 </Box>
                                                 <Box>
                                                     <Typography variant="subtitle1" fontWeight={800}>{step.title}</Typography>
-                                                    <Typography variant="body2" sx={{ color: isDark ? 'text.secondary' : 'rgba(255,255,255,0.6)' }}>{step.desc}</Typography>
+                                                    <Typography variant="body2" sx={{ color: isDark ? 'text.secondary' : 'rgba(255,255,255,0.8)' }}>{step.desc}</Typography>
                                                 </Box>
                                             </Box>
                                         ))}
                                     </Stack>
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                    <Box className="glass" sx={{
+                                    <Box sx={{
                                         p: 5, borderRadius: '32px',
-                                        bgcolor: isDark ? 'background.default !important' : 'rgba(255,255,255,0.03) !important',
-                                        border: isDark ? '1px solid rgba(255,255,255,0.06) !important' : '1px solid rgba(255,255,255,0.1) !important'
+                                        bgcolor: isDark ? theme.palette.background.default : 'rgba(255,255,255,0.03)',
+                                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.08)'}`,
+                                        backdropFilter: 'blur(8px)'
                                     }}>
                                         <Stack spacing={4}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                                 <Avatar sx={{ bgcolor: 'secondary.main', width: 56, height: 56 }}><Security /></Avatar>
                                                 <Box>
                                                     <Typography variant="subtitle1" fontWeight={800} sx={{ color: isDark ? 'text.primary' : 'inherit' }}>Sovereign Identity</Typography>
-                                                    <Typography variant="caption" sx={{ color: isDark ? 'text.secondary' : 'rgba(255,255,255,0.5)' }}>Blockchain-inspired data integrity protocols.</Typography>
+                                                            <Typography variant="caption" sx={{ color: isDark ? 'text.secondary' : 'rgba(255,255,255,0.75)' }}>Blockchain-inspired data integrity protocols.</Typography>
                                                 </Box>
                                             </Box>
-                                            <Divider sx={{ borderColor: isDark ? 'divider' : 'rgba(255,255,255,0.1)' }} />
+                                            <Divider sx={{ borderColor: isDark ? 'divider' : 'rgba(15,23,42,0.08)' }} />
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                                 <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}><Speed /></Avatar>
                                                 <Box>
                                                     <Typography variant="subtitle1" fontWeight={800} sx={{ color: isDark ? 'text.primary' : 'inherit' }}>Sub-ms Latency</Typography>
-                                                    <Typography variant="caption" sx={{ color: isDark ? 'text.secondary' : 'rgba(255,255,255,0.5)' }}>Optimized for emergency medical response.</Typography>
+                                                    <Typography variant="caption" sx={{ color: isDark ? 'text.secondary' : 'rgba(255,255,255,0.75)' }}>Optimized for emergency medical response.</Typography>
                                                 </Box>
                                             </Box>
                                             {/* <Button variant="contained" fullWidth sx={{ mt: 2, height: 56 }}>

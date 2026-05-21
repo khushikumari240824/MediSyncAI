@@ -12,7 +12,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f8fafc;
+  background: var(--app-bg, #f8fafc);
   min-height: 100vh;
 }
 
@@ -27,9 +27,9 @@ code {
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.7) !important;
-  backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(15, 23, 42, 0.06) !important;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07) !important;
 }
 
@@ -38,6 +38,20 @@ code {
   backdrop-filter: blur(12px) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
+
+/* Dark-mode overrides when toggled via ThemeContext */
+body.dark-mode {
+  --app-bg: #071022;
+}
+
+body.dark-mode .glass {
+  background: rgba(15, 23, 42, 0.75) !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
+}
+
+body.dark-mode ::-webkit-scrollbar-track { background: #071022; }
+body.dark-mode ::-webkit-scrollbar-thumb { background: #1f2937; }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {

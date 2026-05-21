@@ -23,6 +23,12 @@ export const ThemeModeProvider = ({ children }) => {
     } catch (e) {}
   }, [mode]);
 
+  // reflect mode on document body so global CSS (index.css) can adapt
+  useEffect(() => {
+    try {
+      document.body.classList.toggle('dark-mode', mode === 'dark');
+    } catch (e) {}
+  }, [mode]);
   const toggleMode = () => setMode((m) => (m === 'light' ? 'dark' : 'light'));
 
   const theme = useMemo(() => buildTheme(mode), [mode]);

@@ -138,7 +138,7 @@ const AIChatbot = () => {
             onKeyDown={handleKeyDown}
             variant="outlined"
           />
-          <IconButton color="primary" type="submit" disabled={loading || !input.trim()} sx={{ bgcolor: theme.palette.primary.main, color: '#fff', '&:hover': { bgcolor: theme.palette.primary.dark } }}>
+          <IconButton color="primary" type="submit" disabled={loading || !input.trim()} sx={{ bgcolor: theme.palette.primary.main, color: theme.palette.common.white, '&:hover': { bgcolor: theme.palette.primary.dark } }}>
             {loading ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
           </IconButton>
         </Box>
