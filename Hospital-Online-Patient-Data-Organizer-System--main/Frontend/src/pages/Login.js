@@ -11,7 +11,8 @@ import {
   Fade,
   Grid,
   Card,
-  CircularProgress
+  CircularProgress,
+  useTheme,
 } from '@mui/material';
 import {
   LocalHospital,
@@ -24,6 +25,13 @@ import {
 import { AuthContext } from '../context/AuthContext';
 
 const Login = () => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  const inputSx = {
+    '& .MuiOutlinedInput-root': {
+      bgcolor: isDark ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255,255,255,0.5)',
+    },
+  };
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -110,7 +118,9 @@ const Login = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%)',
+        background: isDark
+          ? 'linear-gradient(135deg, #050816 0%, #0f172a 50%, #111827 100%)'
+          : 'linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%)',
         position: 'relative',
         overflow: 'hidden',
         py: 4,
@@ -119,7 +129,9 @@ const Login = () => {
           position: 'absolute',
           width: '200%',
           height: '200%',
-          background: 'radial-gradient(circle, rgba(179, 118, 118, 0.84) 1px, transparent 1px)',
+          background: isDark
+            ? 'radial-gradient(circle, rgba(148, 163, 184, 0.18) 1px, transparent 1px)'
+            : 'radial-gradient(circle, rgba(179, 118, 118, 0.84) 1px, transparent 1px)',
           backgroundSize: '50px 50px',
           animation: 'float 20s infinite linear',
         },
@@ -139,13 +151,13 @@ const Login = () => {
                 sx={{
                   padding: 4,
                   height: '100%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    backgroundColor: isDark ? 'rgba(15, 23, 42, 0.92)' : 'rgba(255, 255, 255, 0.9)',
                   backdropFilter: 'blur(10px)',
                   borderRadius: 4,
-                  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+                    boxShadow: isDark ? '0 20px 60px rgba(0, 0, 0, 0.6)' : '0 20px 60px rgba(0, 0, 0, 0.3)',
                   display: 'flex',
                   flexDirection: 'column',
-                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                    border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(255, 255, 255, 0.1)'
                 }}
               >
                 <Box sx={{ textAlign: 'center', mb: 4 }}>
@@ -273,13 +285,13 @@ const Login = () => {
                 sx={{
                   padding: { xs: 3, sm: 5 },
                   height: '100%',
-                  background: 'rgba(199, 223, 223, 0.8)', // Matching Glassmorphism from theme
+                  background: isDark ? 'rgba(15, 23, 42, 0.92)' : 'rgba(199, 223, 223, 0.8)',
                   backdropFilter: 'blur(10px)',
                   borderRadius: 4,
-                  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+                  boxShadow: isDark ? '0 20px 60px rgba(0, 0, 0, 0.6)' : '0 20px 60px rgba(0, 0, 0, 0.3)',
                   display: 'flex',
                   flexDirection: 'column',
-                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                  border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(255, 255, 255, 0.1)'
                 }}
               >
                 <Box sx={{ textAlign: 'center', mb: 4 }}>
@@ -361,7 +373,8 @@ const Login = () => {
                     autoFocus
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    sx={{ mb: 2.5 }}
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ ...inputSx, mb: 2.5 }}
                     InputProps={{
                       startAdornment: (
                         <Email sx={{ color: 'action.active', mr: 1, ml: 1 }} />
@@ -378,7 +391,7 @@ const Login = () => {
                     autoComplete={showReset ? 'new-password' : 'current-password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    sx={{ mb: 1 }}
+                    sx={{ ...inputSx, mb: 1 }}
                     InputProps={{
                       startAdornment: (
                         <Lock sx={{ color: 'action.active', mr: 1, ml: 1 }} />

@@ -31,6 +31,10 @@ import { AuthContext } from '../context/AuthContext';
 
 const Register = () => {
   const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  const fieldSx = {
+    '& .MuiOutlinedInput-root': { bgcolor: isDark ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255,255,255,0.5)' },
+  };
   const [activeStep, setActiveStep] = useState(0);
   const [role, setRole] = useState('');
   const [formData, setFormData] = useState({
@@ -126,7 +130,7 @@ const Register = () => {
               cursor: 'pointer',
               border: '2px solid',
               borderColor: role === option.value ? option.color : 'transparent',
-              background: role === option.value ? alpha(option.color, 0.05) : 'rgba(255,255,255,0.5)',
+              background: role === option.value ? alpha(option.color, 0.08) : (isDark ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255,255,255,0.5)'),
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               '&:hover': {
                 transform: 'translateY(-8px)',
@@ -170,7 +174,7 @@ const Register = () => {
           type="email"
           value={formData.email}
           onChange={handleChange}
-          sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.5)' } }}
+          sx={fieldSx}
         />
       </Grid>
       <Grid item xs={12}>
@@ -183,7 +187,7 @@ const Register = () => {
           value={formData.password}
           onChange={handleChange}
           helperText="Must be at least 6 characters"
-          sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.5)' } }}
+          sx={fieldSx}
         />
       </Grid>
       <Grid item xs={12}>
@@ -194,7 +198,7 @@ const Register = () => {
           name="phone"
           value={formData.phone}
           onChange={handleChange}
-          sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.5)' } }}
+          sx={fieldSx}
         />
       </Grid>
     </Grid>
@@ -206,16 +210,16 @@ const Register = () => {
         return (
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
-              <TextField required fullWidth label="First Name" name="firstName" value={formData.firstName} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.5)' } }} />
+              <TextField required fullWidth label="First Name" name="firstName" value={formData.firstName} onChange={handleChange} sx={fieldSx} />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField required fullWidth label="Last Name" name="lastName" value={formData.lastName} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.5)' } }} />
+              <TextField required fullWidth label="Last Name" name="lastName" value={formData.lastName} onChange={handleChange} sx={fieldSx} />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField required fullWidth label="Date of Birth" name="dateOfBirth" type="date" InputLabelProps={{ shrink: true }} value={formData.dateOfBirth} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.5)' } }} />
+              <TextField required fullWidth label="Date of Birth" name="dateOfBirth" type="date" InputLabelProps={{ shrink: true }} value={formData.dateOfBirth} onChange={handleChange} sx={fieldSx} />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField select required fullWidth label="Gender" name="gender" value={formData.gender} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.5)' } }}>
+              <TextField select required fullWidth label="Gender" name="gender" value={formData.gender} onChange={handleChange} sx={fieldSx}>
                 <MenuItem value="Male">Male</MenuItem>
                 <MenuItem value="Female">Female</MenuItem>
                 <MenuItem value="Other">Other</MenuItem>
@@ -227,19 +231,19 @@ const Register = () => {
         return (
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
-              <TextField required fullWidth label="First Name" name="firstName" value={formData.firstName} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.5)' } }} />
+              <TextField required fullWidth label="First Name" name="firstName" value={formData.firstName} onChange={handleChange} sx={fieldSx} />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField required fullWidth label="Last Name" name="lastName" value={formData.lastName} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.5)' } }} />
+              <TextField required fullWidth label="Last Name" name="lastName" value={formData.lastName} onChange={handleChange} sx={fieldSx} />
             </Grid>
             <Grid item xs={12}>
-              <TextField required fullWidth label="Specialization" name="specialization" value={formData.specialization} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.5)' } }} />
+              <TextField required fullWidth label="Specialization" name="specialization" value={formData.specialization} onChange={handleChange} sx={fieldSx} />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField required fullWidth label="License Number" name="licenseNumber" value={formData.licenseNumber} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.5)' } }} />
+              <TextField required fullWidth label="License Number" name="licenseNumber" value={formData.licenseNumber} onChange={handleChange} sx={fieldSx} />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField required fullWidth label="Department" name="department" value={formData.department} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.5)' } }} />
+              <TextField required fullWidth label="Department" name="department" value={formData.department} onChange={handleChange} sx={fieldSx} />
             </Grid>
           </Grid>
         );
@@ -247,10 +251,10 @@ const Register = () => {
         return (
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <TextField required fullWidth label="Hospital Name" name="name" value={formData.name} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.5)' } }} />
+              <TextField required fullWidth label="Hospital Name" name="name" value={formData.name} onChange={handleChange} sx={fieldSx} />
             </Grid>
             <Grid item xs={12}>
-              <TextField required fullWidth label="Registration Number" name="registrationNumber" value={formData.registrationNumber} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { bgcolor: 'rgba(255,255,255,0.5)' } }} />
+              <TextField required fullWidth label="Registration Number" name="registrationNumber" value={formData.registrationNumber} onChange={handleChange} sx={fieldSx} />
             </Grid>
           </Grid>
         );
@@ -266,7 +270,9 @@ const Register = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%)',
+        background: isDark
+          ? 'linear-gradient(135deg, #050816 0%, #0f172a 50%, #111827 100%)'
+          : 'linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%)',
         position: 'relative',
         overflow: 'hidden',
         py: 4,
@@ -275,7 +281,9 @@ const Register = () => {
           position: 'absolute',
           width: '200%',
           height: '200%',
-          background: 'radial-gradient(circle, rgba(179, 118, 118, 0.84) 1px, transparent 1px)',
+          background: isDark
+            ? 'radial-gradient(circle, rgba(148, 163, 184, 0.18) 1px, transparent 1px)'
+            : 'radial-gradient(circle, rgba(179, 118, 118, 0.84) 1px, transparent 1px)',
           backgroundSize: '50px 50px',
           animation: 'float 20s infinite linear',
         },
@@ -291,11 +299,11 @@ const Register = () => {
             elevation={24}
             sx={{
               p: { xs: 3, sm: 6 },
-              background: 'rgba(255, 255, 255, 0.9)',
+              background: isDark ? 'rgba(15, 23, 42, 0.92)' : 'rgba(255, 255, 255, 0.9)',
               backdropFilter: 'blur(20px)',
               borderRadius: '32px',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: '0 20px 60px -10px rgba(0,0,0,0.1)'
+              border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(255, 255, 255, 0.2)',
+              boxShadow: isDark ? '0 20px 60px -10px rgba(0,0,0,0.6)' : '0 20px 60px -10px rgba(0,0,0,0.1)'
             }}
           >
             <Box sx={{ textAlign: 'center', mb: 6 }}>

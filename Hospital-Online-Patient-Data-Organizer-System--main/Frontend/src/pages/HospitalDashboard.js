@@ -33,6 +33,7 @@ import {
   Person,
   SmartToy,
 } from "@mui/icons-material";
+import ThemeToggle from '../components/common/ThemeToggle';
 import { AuthContext } from "../context/AuthContext";
 import api from "../services/api";
 import StatsCard from "../components/common/StatsCard";
@@ -182,7 +183,7 @@ const HospitalDashboard = () => {
         position="sticky"
         elevation={0}
         sx={{
-          bgcolor: "rgba(255,255,255,0.8)",
+          bgcolor: 'background.paper',
           backdropFilter: "blur(12px)",
           borderBottom: "1px solid",
           borderColor: "divider",
@@ -206,6 +207,7 @@ const HospitalDashboard = () => {
             </Box>
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <ThemeToggle />
             <Button
               color="inherit"
               onClick={() => navigate("/profile")}

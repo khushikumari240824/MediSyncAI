@@ -41,23 +41,23 @@ const buildTheme = (mode = 'light') => createTheme({
             fontSize: '4.5rem',
             letterSpacing: '-0.04em',
             lineHeight: 1.1,
-            color: '#0f172a',
+            color: mode === 'dark' ? '#e6eef8' : '#0f172a',
         },
         h2: {
             fontWeight: 800,
             fontSize: '3.5rem',
             letterSpacing: '-0.02em',
-            color: '#0f172a',
+            color: mode === 'dark' ? '#e6eef8' : '#0f172a',
         },
         h3: {
             fontWeight: 700,
             fontSize: '2.25rem',
-            color: '#26a69a',
+            color: mode === 'dark' ? '#7dd3fc' : '#26a69a',
         },
         body1: {
             fontSize: '1.1rem',
             lineHeight: 1.7,
-            color: '#3E5060',
+            color: mode === 'dark' ? '#9fb3c8' : '#3E5060',
         },
         button: {
             textTransform: 'none',
@@ -69,6 +69,18 @@ const buildTheme = (mode = 'light') => createTheme({
         borderRadius: 16,
     },
     components: {
+        MuiCssBaseline: {
+            styleOverrides: {
+                body: {
+                    backgroundColor: mode === 'dark' ? '#0b1220' : '#f8fafc',
+                    color: mode === 'dark' ? '#e6eef8' : '#0f172a',
+                    transition: 'background-color 180ms ease, color 180ms ease',
+                },
+                a: {
+                    color: 'inherit',
+                },
+            },
+        },
         MuiButton: {
             styleOverrides: {
                 root: {

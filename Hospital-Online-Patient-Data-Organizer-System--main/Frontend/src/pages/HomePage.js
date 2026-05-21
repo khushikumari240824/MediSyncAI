@@ -13,8 +13,10 @@ import {
     Stack,
     Chip,
     Avatar,
-    Divider
+    Divider,
+    useTheme,
 } from '@mui/material';
+import ThemeToggle from '../components/common/ThemeToggle';
 import {
     LocalHospital,
     People,
@@ -28,6 +30,8 @@ import {
 
 const HomePage = () => {
     const navigate = useNavigate();
+    const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
 
     const portalTiles = [
         {
@@ -71,7 +75,8 @@ const HomePage = () => {
 
     return (
         <Box sx={{
-            bgcolor: '#f8fafc',
+            bgcolor: 'background.default',
+            color: 'text.primary',
             minHeight: '100vh',
             display: 'flex',
             flexDirection: 'column',
@@ -91,7 +96,7 @@ const HomePage = () => {
             }} />
 
             {/* Premium Navbar */}
-            <AppBar position="fixed" elevation={0} className="glass">
+            <AppBar position="fixed" elevation={0} sx={{ bgcolor: 'background.paper' }}>
                 <Container maxWidth="xl">
                     <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: '80px' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -105,12 +110,12 @@ const HomePage = () => {
                             </Box>
                             <Box>
                                 <Typography variant="h6" sx={{
-                                    fontWeight: 900, fontSize: '1.4rem', color: '#0f172a',
+                                    fontWeight: 900, fontSize: '1.4rem', color: 'text.primary',
                                     letterSpacing: '-0.04em', lineHeight: 1
                                 }}>
                                     HOPDS (Hopital online patient data management system)
                                 </Typography>
-                                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                                     Precision Control
                                 </Typography>
                             </Box>
@@ -133,6 +138,10 @@ const HomePage = () => {
                             >
                                 Login
                             </Button>
+                            {/* Theme toggle */}
+                            <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+                                <ThemeToggle />
+                            </Box>
                         </Stack>
                     </Toolbar>
                 </Container>
@@ -154,7 +163,7 @@ const HomePage = () => {
                                 px: 1
                             }}
                         />
-                        <Typography variant="h1" sx={{ color: '#0f172a', mb: 3 }}>
+                        <Typography variant="h1" sx={{ color: 'text.primary', mb: 3 }}>
                             Unified Healthcare<br />
                             <Box component="span" sx={{
                                 background: 'linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%)',
@@ -162,7 +171,7 @@ const HomePage = () => {
                                 WebkitTextFillColor: 'transparent'
                             }}>Management Dashboard</Box>
                         </Typography>
-                        <Typography variant="h6" sx={{ color: '#64748b', mb: 5, maxWidth: '700px', mx: 'auto', fontWeight: 500 }}>
+                        <Typography variant="h6" sx={{ color: 'text.secondary', mb: 5, maxWidth: '700px', mx: 'auto', fontWeight: 500 }}>
                             HOPDS (Hopital oline patient data management system) bridges the gap between clinicians, patients, and administrators with a secure, real-time data ecosystem optimized for performance.
                         </Typography>
 
@@ -187,7 +196,7 @@ const HomePage = () => {
                     </Box>
 
                     {/* Portals Section */}
-                    <Typography variant="h5" sx={{ fontWeight: 900, mb: 5, color: '#0f172a', textAlign: 'center' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 900, mb: 5, color: 'text.primary', textAlign: 'center' }}>
                         Choose Your Portal
                     </Typography>
                     <Grid container spacing={4}>
@@ -206,14 +215,14 @@ const HomePage = () => {
                                         }
                                     }
                                 }}>
-                                    <Box sx={{
-                                        p: 4,
-                                        height: '100%',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        borderRadius: '28px',
-                                        bgcolor: '#fff'
-                                    }}>
+                                        <Box sx={{
+                                            p: 4,
+                                            height: '100%',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            borderRadius: '28px',
+                                            bgcolor: 'background.paper'
+                                        }}>
                                         <Box sx={{
                                             width: 64, height: 64, borderRadius: '20px',
                                             background: portal.gradient,
@@ -224,10 +233,10 @@ const HomePage = () => {
                                             <portal.icon sx={{ color: '#fff', fontSize: 32 }} />
                                         </Box>
 
-                                        <Typography variant="h5" sx={{ fontWeight: 800, mb: 2, color: '#0f172a' }}>
+                                        <Typography variant="h5" sx={{ fontWeight: 800, mb: 2, color: 'text.primary' }}>
                                             {portal.title}
                                         </Typography>
-                                        <Typography variant="body2" sx={{ color: '#64748b', mb: 4, flexGrow: 1, lineHeight: 1.6 }}>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary', mb: 4, flexGrow: 1, lineHeight: 1.6 }}>
                                             {portal.desc}
                                         </Typography>
 
@@ -281,8 +290,8 @@ const HomePage = () => {
                                         border: '1px solid rgba(255,255,255,0.4)',
                                     }}>
                                         <info.icon sx={{ fontSize: 40, color: info.color, mb: 2 }} />
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 1.5, color: '#0f172a' }}>{info.title}</Typography>
-                                        <Typography variant="caption" sx={{ color: '#64748b', lineHeight: 1.6, display: 'block' }}>{info.desc}</Typography>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 1.5, color: 'text.primary' }}>{info.title}</Typography>
+                                        <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.6, display: 'block' }}>{info.desc}</Typography>
                                     </Box>
                                 </Grid>
                             ))}
@@ -294,8 +303,8 @@ const HomePage = () => {
                         <Paper elevation={0} sx={{
                             p: { xs: 4, md: 8 },
                             borderRadius: '48px',
-                            bgcolor: '#0f172a',
-                            color: 'white',
+                            bgcolor: isDark ? 'background.paper' : '#0f172a',
+                            color: isDark ? 'text.primary' : 'white',
                             overflow: 'hidden',
                             position: 'relative'
                         }}>
@@ -307,11 +316,11 @@ const HomePage = () => {
 
                             <Grid container spacing={8} alignItems="center">
                                 <Grid item xs={12} md={6}>
-                                    <Typography variant="h2" sx={{ color: 'white', mb: 4 }}>
+                                    <Typography variant="h2" sx={{ color: isDark ? 'text.primary' : 'white', mb: 4 }}>
                                         Engineered for <br />
                                         <Box component="span" sx={{ color: 'primary.light' }}>Performance</Box>
                                     </Typography>
-                                    <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)', mb: 6 }}>
+                                    <Typography variant="body1" sx={{ color: isDark ? 'text.secondary' : 'rgba(255,255,255,0.7)', mb: 6 }}>
                                         Our architecture prioritize interoperability and zero-latency data access, ensuring that life-critical information is always where it belongs: in the hands of care providers.
                                     </Typography>
                                     <Stack spacing={4}>
@@ -331,7 +340,7 @@ const HomePage = () => {
                                                 </Box>
                                                 <Box>
                                                     <Typography variant="subtitle1" fontWeight={800}>{step.title}</Typography>
-                                                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>{step.desc}</Typography>
+                                                    <Typography variant="body2" sx={{ color: isDark ? 'text.secondary' : 'rgba(255,255,255,0.6)' }}>{step.desc}</Typography>
                                                 </Box>
                                             </Box>
                                         ))}
@@ -340,23 +349,23 @@ const HomePage = () => {
                                 <Grid item xs={12} md={6}>
                                     <Box className="glass" sx={{
                                         p: 5, borderRadius: '32px',
-                                        bgcolor: 'rgba(255,255,255,0.03) !important',
-                                        border: '1px solid rgba(255,255,255,0.1) !important'
+                                        bgcolor: isDark ? 'background.default !important' : 'rgba(255,255,255,0.03) !important',
+                                        border: isDark ? '1px solid rgba(255,255,255,0.06) !important' : '1px solid rgba(255,255,255,0.1) !important'
                                     }}>
                                         <Stack spacing={4}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                                 <Avatar sx={{ bgcolor: 'secondary.main', width: 56, height: 56 }}><Security /></Avatar>
                                                 <Box>
-                                                    <Typography variant="subtitle1" fontWeight={800}>Sovereign Identity</Typography>
-                                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>Blockchain-inspired data integrity protocols.</Typography>
+                                                    <Typography variant="subtitle1" fontWeight={800} sx={{ color: isDark ? 'text.primary' : 'inherit' }}>Sovereign Identity</Typography>
+                                                    <Typography variant="caption" sx={{ color: isDark ? 'text.secondary' : 'rgba(255,255,255,0.5)' }}>Blockchain-inspired data integrity protocols.</Typography>
                                                 </Box>
                                             </Box>
-                                            <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+                                            <Divider sx={{ borderColor: isDark ? 'divider' : 'rgba(255,255,255,0.1)' }} />
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                                 <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}><Speed /></Avatar>
                                                 <Box>
-                                                    <Typography variant="subtitle1" fontWeight={800}>Sub-ms Latency</Typography>
-                                                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>Optimized for emergency medical response.</Typography>
+                                                    <Typography variant="subtitle1" fontWeight={800} sx={{ color: isDark ? 'text.primary' : 'inherit' }}>Sub-ms Latency</Typography>
+                                                    <Typography variant="caption" sx={{ color: isDark ? 'text.secondary' : 'rgba(255,255,255,0.5)' }}>Optimized for emergency medical response.</Typography>
                                                 </Box>
                                             </Box>
                                             {/* <Button variant="contained" fullWidth sx={{ mt: 2, height: 56 }}>

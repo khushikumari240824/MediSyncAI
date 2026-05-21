@@ -36,6 +36,7 @@ const Profile = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const fileInputRef = useRef(null);
 
   const [profileData, setProfileData] = useState(null);
@@ -184,7 +185,7 @@ const Profile = () => {
         position="sticky"
         elevation={0}
         sx={{
-          bgcolor: "rgba(255,255,255,0.8)",
+          bgcolor: isDark ? "rgba(3,7,18,0.7)" : "rgba(255,255,255,0.8)",
           backdropFilter: "blur(12px)",
           borderBottom: "1px solid",
           borderColor: "divider",
@@ -253,7 +254,7 @@ const Profile = () => {
                 borderRadius: "32px",
                 border: "1px solid",
                 borderColor: "divider",
-                background: "rgba(255,255,255,0.6)",
+                background: isDark ? "rgba(15,23,42,0.85)" : "rgba(255,255,255,0.6)",
                 backdropFilter: "blur(10px)",
                 textAlign: "center",
                 position: "sticky",
@@ -273,8 +274,8 @@ const Profile = () => {
                     color: "primary.main",
                     fontSize: "4rem",
                     fontWeight: 700,
-                    border: "6px solid white",
-                    boxShadow: "0 20px 40px -10px rgba(0,0,0,0.1)",
+                    border: isDark ? "6px solid #0f172a" : "6px solid white",
+                    boxShadow: isDark ? "0 20px 40px -10px rgba(0,0,0,0.6)" : "0 20px 40px -10px rgba(0,0,0,0.1)",
                   }}
                 >
                   {!previewImage && getInitials()}
@@ -287,7 +288,7 @@ const Profile = () => {
                       right: 8,
                       bgcolor: "primary.main",
                       color: "white",
-                      border: "4px solid white",
+                      border: isDark ? "4px solid #0f172a" : "4px solid white",
                       "&:hover": { bgcolor: "primary.dark" },
                       boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
                     }}
