@@ -4,10 +4,18 @@ const { auth, authorize } = require("../middlewares/auth");
 
 const router = express.Router();
 
+const getPatientProfile = async (user) => {
+  if (user?.profileId && user.roleModel === "Patient") {
+    return user.profileId;
+  }
+
+  return Patient.findOne({ user: user?._id });
+};
+
 // Get patient profile
 router.get("/me", auth, authorize("patient"), async (req, res) => {
   try {
-    const patient = await Patient.findOne({ user: req.user._id });
+    const patient = await getPatientProfile(req.user);
     if (!patient) {
       return res.status(404).json({ message: "Patient profile not found" });
     }
@@ -32,7 +40,7 @@ router.get("/all", auth, authorize("hospital"), async (req, res) => {
 // Update patient profile
 router.patch("/me", auth, authorize("patient"), async (req, res) => {
   try {
-    const patient = await Patient.findOne({ user: req.user._id });
+    const patient = await getPatientProfile(req.user);
     if (!patient) {
       return res.status(404).json({ message: "Patient profile not found" });
     }

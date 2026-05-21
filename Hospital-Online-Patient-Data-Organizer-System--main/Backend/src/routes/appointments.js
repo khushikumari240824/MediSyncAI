@@ -7,6 +7,14 @@ const { auth, authorize } = require("../middlewares/auth");
 
 const router = express.Router();
 
+const getPatientProfile = async (user) => {
+  if (user?.profileId && user.roleModel === "Patient") {
+    return user.profileId;
+  }
+
+  return Patient.findOne({ user: user?._id });
+};
+
 // Book appointment (Patient)
 router.post(
   "/",
@@ -26,7 +34,7 @@ router.post(
       }
 
       const { doctorId, appointmentDate, appointmentTime, reason } = req.body;
-      const patient = await Patient.findOne({ user: req.user._id });
+      const patient = await getPatientProfile(req.user);
 
       if (!patient) {
         return res.status(404).json({ message: "Patient profile not found" });
@@ -66,7 +74,7 @@ router.post(
 // Get patient appointments
 router.get("/patient", auth, authorize("patient"), async (req, res) => {
   try {
-    const patient = await Patient.findOne({ user: req.user._id });
+    const patient = await getPatientProfile(req.user);
     if (!patient) {
       return res.status(404).json({ message: "Patient profile not found" });
     }
@@ -214,7 +222,7 @@ router.get('/:id', auth, async (req, res) => {
     const role = req.user.role;
 
     if (role === 'patient') {
-      const patient = await Patient.findOne({ user: req.user._id });
+      const patient = await getPatientProfile(req.user);
       if (!patient || appointment.patient.toString() !== patient._id.toString()) {
         return res.status(403).json({ message: 'Not authorized' });
       }

@@ -19,6 +19,14 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 
 
 const router = express.Router();
 
+const getPatientProfile = async (user) => {
+  if (user?.profileId && user.roleModel === "Patient") {
+    return user.profileId;
+  }
+
+  return Patient.findOne({ user: user?._id });
+};
+
 // Create medical record (Doctor)
 router.post(
   "/",
@@ -56,7 +64,7 @@ router.post(
 // Get patient medical records (Patient)
 router.get("/patient", auth, authorize("patient"), async (req, res) => {
   try {
-    const patient = await Patient.findOne({ user: req.user._id });
+    const patient = await getPatientProfile(req.user);
     if (!patient) {
       return res.status(404).json({ message: "Patient profile not found" });
     }

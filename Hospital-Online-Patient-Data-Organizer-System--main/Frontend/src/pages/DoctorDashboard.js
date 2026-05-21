@@ -201,6 +201,11 @@ const DoctorDashboard = () => {
 
   const handleCreateReport = async () => {
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setMessage("You must be logged in to create a report.");
+        return;
+      }
       if (reportData.file) {
         const fd = new FormData();
         fd.append("file", reportData.file);
@@ -208,11 +213,16 @@ const DoctorDashboard = () => {
         fd.append("diagnosis", reportData.diagnosis || "");
         fd.append("treatment", reportData.treatment || "");
         fd.append("notes", reportData.notes || "");
-        await api.post("/medical-records/upload", fd, {
-          onUploadProgress: (e) => {
-            if (e.total) setUploadProgress(Math.round((e.loaded * 100) / e.total));
+        await api.post(
+          "/medical-records/upload",
+          fd,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            onUploadProgress: (e) => {
+              if (e.total) setUploadProgress(Math.round((e.loaded * 100) / e.total));
+            },
           },
-        });
+        );
       } else {
         await api.post("/medical-records", reportData);
       }
