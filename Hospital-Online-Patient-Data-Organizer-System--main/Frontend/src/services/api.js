@@ -2,23 +2,15 @@ import axios from "axios";
 
 // Build backend base URL robustly. If REACT_APP_BACKEND is set, use it
 // (trim trailing slash). Otherwise fall back to relative '/api' so local
-// development still works. In deployed builds make sure to set
-// REACT_APP_BACKEND to the backend host (e.g. https://my-backend.azurewebsites.net).
+// development still works.
 const rawBackend = process.env.REACT_APP_BACKEND || "";
 let backendHost = rawBackend ? rawBackend.replace(/\/+$/, "") : "";
-// Temporary fallback: if REACT_APP_BACKEND is not set in the hosting environment
-// (common on Vercel if you didn't add env vars), use the deployed Azure backend
-// URL you provided. This is a pragmatic fallback so the deployed frontend can
-// reach the API immediately. Recommended: set REACT_APP_BACKEND in your host.
-const FALLBACK_BACKEND = "https://hospitalmanage-csgrbmfweggcg7ak.centralindia-01.azurewebsites.net";
 if (!backendHost) {
   // eslint-disable-next-line no-console
   console.warn(
-    'REACT_APP_BACKEND is not set. Using temporary fallback backend:',
-    FALLBACK_BACKEND,
-    '\nPlease set REACT_APP_BACKEND in your hosting environment and redeploy to remove this fallback.'
+    'REACT_APP_BACKEND is not set. Frontend will call relative /api paths.\n' +
+      'For a deployed frontend, set REACT_APP_BACKEND to your Render backend URL (for example https://your-service.onrender.com) and redeploy.'
   );
-  backendHost = FALLBACK_BACKEND;
 }
 
 const api = axios.create({
