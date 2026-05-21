@@ -27,6 +27,14 @@ const getPatientProfile = async (user) => {
   return Patient.findOne({ user: user?._id });
 };
 
+const getDoctorProfile = async (user) => {
+  if (user?.profileId && user.roleModel === "Doctor") {
+    return user.profileId;
+  }
+
+  return Doctor.findOne({ user: user?._id });
+};
+
 // Create medical record (Doctor)
 router.post(
   "/",
@@ -40,7 +48,7 @@ router.post(
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const doctor = await Doctor.findOne({ user: req.user._id });
+      const doctor = await getDoctorProfile(req.user);
       if (!doctor) {
         return res.status(404).json({ message: "Doctor profile not found" });
       }
@@ -84,7 +92,7 @@ router.get("/patient", auth, authorize("patient"), async (req, res) => {
 // Get doctor's medical records
 router.get("/doctor", auth, authorize("doctor"), async (req, res) => {
   try {
-    const doctor = await Doctor.findOne({ user: req.user._id });
+    const doctor = await getDoctorProfile(req.user);
     if (!doctor) {
       return res.status(404).json({ message: "Doctor profile not found" });
     }
@@ -139,7 +147,7 @@ router.get("/:id", auth, async (req, res) => {
 // Update medical record (Doctor)
 router.patch("/:id", auth, authorize("doctor"), async (req, res) => {
   try {
-    const doctor = await Doctor.findOne({ user: req.user._id });
+    const doctor = await getDoctorProfile(req.user);
     const record = await MedicalRecord.findById(req.params.id);
 
     if (!record) {
@@ -169,7 +177,7 @@ router.post(
   upload.single("file"),
   async (req, res) => {
     try {
-      const doctor = await Doctor.findOne({ user: req.user._id });
+      const doctor = await getDoctorProfile(req.user);
       if (!doctor) {
         return res.status(404).json({ message: "Doctor profile not found" });
       }

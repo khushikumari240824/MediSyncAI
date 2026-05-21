@@ -15,6 +15,14 @@ const getPatientProfile = async (user) => {
   return Patient.findOne({ user: user?._id });
 };
 
+const getDoctorProfile = async (user) => {
+  if (user?.profileId && user.roleModel === "Doctor") {
+    return user.profileId;
+  }
+
+  return Doctor.findOne({ user: user?._id });
+};
+
 // Book appointment (Patient)
 router.post(
   "/",
@@ -93,7 +101,7 @@ router.get("/patient", auth, authorize("patient"), async (req, res) => {
 // Get doctor appointments
 router.get("/doctor", auth, authorize("doctor"), async (req, res) => {
   try {
-    const doctor = await Doctor.findOne({ user: req.user._id });
+    const doctor = await getDoctorProfile(req.user);
     if (!doctor) {
       return res.status(404).json({ message: "Doctor profile not found" });
     }
@@ -132,6 +140,7 @@ router.patch(
   [
     body("status").isIn([
       "scheduled",
+      "confirmed",
       "checked-in",
       "in-progress",
       "completed",
@@ -146,7 +155,7 @@ router.patch(
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const doctor = await Doctor.findOne({ user: req.user._id });
+      const doctor = await getDoctorProfile(req.user);
       const appointment = await Appointment.findById(req.params.id);
 
       if (!appointment) {
@@ -182,7 +191,7 @@ router.patch(
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const doctor = await Doctor.findOne({ user: req.user._id });
+      const doctor = await getDoctorProfile(req.user);
       const appointment = await Appointment.findById(req.params.id);
 
       if (!appointment) {
@@ -227,7 +236,7 @@ router.get('/:id', auth, async (req, res) => {
         return res.status(403).json({ message: 'Not authorized' });
       }
     } else if (role === 'doctor') {
-      const doctor = await Doctor.findOne({ user: req.user._id });
+      const doctor = await getDoctorProfile(req.user);
       if (!doctor || appointment.doctor.toString() !== doctor._id.toString()) {
         return res.status(403).json({ message: 'Not authorized' });
       }

@@ -14,6 +14,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Link,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -128,6 +129,13 @@ const DoctorDashboard = () => {
   const getDoctor = (item) => item.doctor || item.doctorId || null;
   const isValidDate = (d) => d instanceof Date && !isNaN(d.getTime());
 
+  const getRecordTypeFromFile = (file) => {
+    if (!file) return "other";
+    if (file.type === "application/pdf") return "pdf";
+    if (file.type.startsWith("image/")) return "image";
+    return "other";
+  };
+
   const getScheduledAt = (apt) => {
     if (!apt) return null;
 
@@ -213,22 +221,26 @@ const DoctorDashboard = () => {
         fd.append("diagnosis", reportData.diagnosis || "");
         fd.append("treatment", reportData.treatment || "");
         fd.append("notes", reportData.notes || "");
-        await api.post(
-          "/medical-records/upload",
-          fd,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-            onUploadProgress: (e) => {
-              if (e.total) setUploadProgress(Math.round((e.loaded * 100) / e.total));
-            },
+        fd.append("recordType", getRecordTypeFromFile(reportData.file));
+        await api.post("/medical-records/upload", fd, {
+          headers: { Authorization: `Bearer ${token}` },
+          onUploadProgress: (e) => {
+            if (e.total)
+              setUploadProgress(Math.round((e.loaded * 100) / e.total));
           },
-        );
+        });
       } else {
         await api.post("/medical-records", reportData);
       }
       setMessage("Medical report created successfully!");
       setOpenReport(false);
-      setReportData({ patientId: "", diagnosis: "", treatment: "", notes: "", file: null });
+      setReportData({
+        patientId: "",
+        diagnosis: "",
+        treatment: "",
+        notes: "",
+        file: null,
+      });
       fetchMedicalRecords();
     } catch (error) {
       // Log full response for debugging
@@ -245,8 +257,12 @@ const DoctorDashboard = () => {
     // In a real app, you might fetch specific history here.
     // For now, we filter existing loaded data for simplicity,
     // but ideally we should hit an endpoint like /api/patients/:id/history
-    const patientAppointments = appointments.filter((a) => getPatient(a)?._id === patientId);
-    const patientRecords = medicalRecords.filter((r) => (r.patient || r.patientId)?._id === patientId);
+    const patientAppointments = appointments.filter(
+      (a) => getPatient(a)?._id === patientId,
+    );
+    const patientRecords = medicalRecords.filter(
+      (r) => (r.patient || r.patientId)?._id === patientId,
+    );
 
     setSelectedPatientHistory({
       appointments: patientAppointments,
@@ -517,10 +533,13 @@ const DoctorDashboard = () => {
                           >
                             <Schedule sx={{ fontSize: 14 }} />{" "}
                             {getScheduledAt(appointment)
-                              ? getScheduledAt(appointment).toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })
+                              ? getScheduledAt(appointment).toLocaleTimeString(
+                                  [],
+                                  {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  },
+                                )
                               : appointment.appointmentTime || "-"}
                           </Typography>
                         </TableCell>
@@ -545,7 +564,7 @@ const DoctorDashboard = () => {
                             </Avatar>
                             <Box>
                               <Typography variant="body2" fontWeight={600}>
-                                {getPatient(appointment)?.firstName} {" "}
+                                {getPatient(appointment)?.firstName}{" "}
                                 {getPatient(appointment)?.lastName}
                               </Typography>
                               <Typography
@@ -588,7 +607,12 @@ const DoctorDashboard = () => {
                               onClick={() =>
                                 handleStatusChange(appointment._id, "confirmed")
                               }
-                              disabled={!(appointment.status === "pending" || appointment.status === "scheduled")}
+                              disabled={
+                                !(
+                                  appointment.status === "pending" ||
+                                  appointment.status === "scheduled"
+                                )
+                              }
                               sx={{ borderRadius: "8px" }}
                             >
                               Confirm
@@ -711,11 +735,14 @@ const DoctorDashboard = () => {
                                 color: "secondary.main",
                               }}
                             >
-                              {(record.patient || record.patientId)?.firstName?.[0]}
+                              {
+                                (record.patient || record.patientId)
+                                  ?.firstName?.[0]
+                              }
                             </Avatar>
                             <Typography variant="body2" fontWeight={600}>
-                                {(record.patient || record.patientId)?.firstName} {" "}
-                                {(record.patient || record.patientId)?.lastName}
+                              {(record.patient || record.patientId)?.firstName}{" "}
+                              {(record.patient || record.patientId)?.lastName}
                             </Typography>
                           </Box>
                         </TableCell>
@@ -734,11 +761,47 @@ const DoctorDashboard = () => {
                             {record.treatment || "-"}
                           </Typography>
                         </TableCell>
+                        <TableCell>
+                          <Stack spacing={0.5}>
+                            <Chip
+                              size="small"
+                              label={(
+                                record.recordType || "other"
+                              ).toUpperCase()}
+                              sx={{ alignSelf: "flex-start" }}
+                            />
+                            {record.cloudinaryUrl ? (
+                              <Link
+                                href={record.cloudinaryUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                underline="hover"
+                                variant="body2"
+                              >
+                                Open attachment
+                              </Link>
+                            ) : record.fileName ? (
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {record.fileName}
+                              </Typography>
+                            ) : (
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                No attachment
+                              </Typography>
+                            )}
+                          </Stack>
+                        </TableCell>
                       </TableRow>
                     ))}
                     {medicalRecords.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={4} align="center" sx={{ py: 8 }}>
+                        <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
                           <Box
                             sx={{
                               display: "flex",
@@ -909,9 +972,11 @@ const DoctorDashboard = () => {
                     <React.Fragment key={apt._id}>
                       <ListItem alignItems="flex-start">
                         <ListItemText
-                          primary={`${getScheduledAt(apt)
-                            ? getScheduledAt(apt).toLocaleDateString()
-                            : "-"} - ${apt.status}`}
+                          primary={`${
+                            getScheduledAt(apt)
+                              ? getScheduledAt(apt).toLocaleDateString()
+                              : "-"
+                          } - ${apt.status}`}
                           secondary={
                             <React.Fragment>
                               <Typography

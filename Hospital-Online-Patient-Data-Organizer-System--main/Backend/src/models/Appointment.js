@@ -34,6 +34,7 @@ const appointmentSchema = new mongoose.Schema(
       type: String,
       enum: [
         "scheduled",
+        "confirmed",
         "checked-in",
         "in-progress",
         "completed",
