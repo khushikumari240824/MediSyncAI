@@ -1,50 +1,52 @@
 import axios from "axios";
 
-// Build backend base URL robustly. If REACT_APP_BACKEND is set, use it
-// (trim trailing slash). Otherwise fall back to relative '/api' so local
-// development still works.
-const rawBackend = process.env.REACT_APP_BACKEND || "";
-let backendHost = rawBackend ? rawBackend.replace(/\/+$/, "") : "";
+// Get backend URL from .env
+const backendHost =
+  process.env.REACT_APP_BACKEND?.replace(/\/+$/, "") || "";
+
 if (!backendHost) {
-  // eslint-disable-next-line no-console
   console.warn(
-    'REACT_APP_BACKEND is not set. Frontend will call relative /api paths.\n' +
-      'For a deployed frontend, set REACT_APP_BACKEND to your Render backend URL (for example https://your-service.onrender.com) and redeploy.'
+    "REACT_APP_BACKEND is not set. Falling back to local /api"
   );
 }
 
 const api = axios.create({
-  baseURL: backendHost ? `${backendHost}/api` : '/api',
+  // Do NOT add /api again
+  baseURL: backendHost || "/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
+// Attach token automatically
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    // If sending FormData, let the browser set the Content-Type header
-    // (including the multipart boundary). The instance default is
-    // application/json, which would break multipart uploads.
+
+    // Fix file upload issue
     if (config.data instanceof FormData) {
       delete config.headers["Content-Type"];
     }
+
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
+// Handle unauthorized responses
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
     }
+
     return Promise.reject(error);
-  },
+  }
 );
 
 export default api;
