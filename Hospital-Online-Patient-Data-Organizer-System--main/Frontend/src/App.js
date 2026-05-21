@@ -13,6 +13,7 @@ import DoctorDashboard from './pages/DoctorDashboard';
 import HospitalDashboard from './pages/HospitalDashboard';
 import Profile from './pages/Profile';
 import HomePage from './pages/HomePage';
+import AIChatbot from './pages/AIChatbot';
 import theme from './theme';
 
 function App() {
@@ -29,6 +30,14 @@ function App() {
               path="/patient"
               element={
                 <PrivateRoute allowedRoles={['patient']}>
+            <Route
+              path="/ai-chat"
+              element={
+                <PrivateRoute allowedRoles={["patient","doctor","hospital"]}>
+                  <AIChatbot />
+                </PrivateRoute>
+              }
+            />
                   <PatientDashboard />
                 </PrivateRoute>
               }

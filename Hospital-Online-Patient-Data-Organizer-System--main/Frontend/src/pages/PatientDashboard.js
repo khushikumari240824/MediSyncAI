@@ -41,6 +41,7 @@ import {
   Add,
   History,
   Info,
+  SmartToy,
 } from "@mui/icons-material";
 import { AuthContext } from "../context/AuthContext";
 import api from "../services/api";
@@ -276,21 +277,31 @@ const PatientDashboard = () => {
           title={`Hello, ${user?.firstName || "User"}`}
           subtitle="Manage your health journey"
           action={
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              onClick={() => setOpenAppointment(true)}
-              sx={{
-                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                boxShadow: "0 8px 16px -4px rgba(0,118,255,0.39)",
-                borderRadius: "12px",
-                px: 3,
-                py: 1.5,
-                fontWeight: 600,
-              }}
-            >
-              Book Appointment
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                variant="contained"
+                startIcon={<Add />}
+                onClick={() => setOpenAppointment(true)}
+                sx={{
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                  boxShadow: "0 8px 16px -4px rgba(0,118,255,0.39)",
+                  borderRadius: "12px",
+                  px: 3,
+                  py: 1.5,
+                  fontWeight: 600,
+                }}
+              >
+                Book Appointment
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<SmartToy />}
+                onClick={() => navigate('/ai-chat')}
+                sx={{ borderRadius: '12px', px: 2 }}
+              >
+                AI Assistant
+              </Button>
+            </Box>
           }
         />
 

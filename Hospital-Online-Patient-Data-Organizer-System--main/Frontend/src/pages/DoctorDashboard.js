@@ -45,6 +45,7 @@ import {
   Schedule,
   AddBox,
   History,
+  SmartToy,
 } from "@mui/icons-material";
 import { AuthContext } from "../context/AuthContext";
 import api from "../services/api";
@@ -361,20 +362,30 @@ const DoctorDashboard = () => {
           title={`Welcome back, Dr. ${user?.firstName || "Doctor"}`}
           subtitle="Manage your appointments and patient records effectively"
           action={
-            <Button
-              variant="contained"
-              startIcon={<AddBox />}
-              onClick={() => setOpenReport(true)}
-              sx={{
-                px: 3,
-                py: 1.5,
-                borderRadius: "12px",
-                fontSize: "1rem",
-                fontWeight: 600,
-              }}
-            >
-              Create New Report
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                variant="contained"
+                startIcon={<AddBox />}
+                onClick={() => setOpenReport(true)}
+                sx={{
+                  px: 3,
+                  py: 1.5,
+                  borderRadius: "12px",
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                }}
+              >
+                Create New Report
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<SmartToy />}
+                onClick={() => navigate('/ai-chat')}
+                sx={{ borderRadius: '12px', px: 2 }}
+              >
+                AI Assistant
+              </Button>
+            </Box>
           }
         />
 

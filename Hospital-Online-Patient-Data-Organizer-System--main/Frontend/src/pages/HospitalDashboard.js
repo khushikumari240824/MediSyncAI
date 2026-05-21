@@ -31,6 +31,7 @@ import {
   CalendarToday,
   Assignment,
   Person,
+  SmartToy,
 } from "@mui/icons-material";
 import { AuthContext } from "../context/AuthContext";
 import api from "../services/api";
@@ -230,6 +231,11 @@ const HospitalDashboard = () => {
         <PageHeader
           title={`Welcome, ${user?.name || "Admin"}`}
           subtitle="Hospital Overview & Management"
+          action={
+            <Button variant="outlined" startIcon={<SmartToy />} onClick={() => navigate('/ai-chat')} sx={{ borderRadius: '12px' }}>
+              AI Assistant
+            </Button>
+          }
         />
 
         {error && (
